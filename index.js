@@ -1,16 +1,14 @@
 const express = require('express');
-
 const Bot = require('./Bot');
+
 var app = express();
-var mqtt = require('mqtt');
 
 // 探活请求
-// DuerOS会定期发送探活请求到你的服务，确保你的服务正常运转，[详情请参考](http://TODO)
 app.head('/', (req, res) => {
     res.sendStatus(204);
 });
 
-// 监听post请求，DuerOS以http POST的方式来请求你的服务，[具体协议请参考](http://TODO)
+// 监听post请求，DuerOS以http POST的方式来请求你的服务
 app.post('/', (req, res) => {
     req.rawBody = '';
 
