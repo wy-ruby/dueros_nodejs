@@ -1,0 +1,97 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "bot-sdk",
+        "scope": null,
+        "escapedName": "bot-sdk",
+        "name": "bot-sdk",
+        "rawSpec": "",
+        "spec": "latest",
+        "type": "tag"
+      },
+      "/Users/zhangxuesong/work/duer-node"
+    ]
+  ],
+  "_cnpm_publish_time": 1515141736432,
+  "_from": "bot-sdk@latest",
+  "_hasShrinkwrap": false,
+  "_id": "bot-sdk@1.1.1",
+  "_inCache": true,
+  "_location": "/bot-sdk",
+  "_nodeVersion": "6.9.1",
+  "_npmOperationalInternal": {
+    "host": "s3://npm-registry-packages",
+    "tmp": "tmp/bot-sdk-1.1.1.tgz_1515141735982_0.5679038842208683"
+  },
+  "_npmUser": {
+    "name": "yuanpeng",
+    "email": "yuanpeng.3007@163.com"
+  },
+  "_npmVersion": "3.10.8",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "bot-sdk",
+    "scope": null,
+    "escapedName": "bot-sdk",
+    "name": "bot-sdk",
+    "rawSpec": "",
+    "spec": "latest",
+    "type": "tag"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npm.taobao.org/bot-sdk/download/bot-sdk-1.1.1.tgz",
+  "_shasum": "72fbf0c71602a666fcdd2886bfa668418c5f2c27",
+  "_shrinkwrap": null,
+  "_spec": "bot-sdk",
+  "_where": "/Users/zhangxuesong/work/duer-node",
+  "author": {
+    "name": "yuanpeng01@baidu.com"
+  },
+  "bugs": {
+    "url": "https://github.com/dueros/bot-sdk-node.js/issues"
+  },
+  "dependencies": {
+    "bot-monitor-sdk": "^1.2.2",
+    "node.extend": "^2.0.0",
+    "request": "^2.83.0"
+  },
+  "description": "度秘bot开发的JS SDK",
+  "devDependencies": {
+    "jsdoc-to-markdown": "^3.0.0",
+    "mocha": "^3.5.0",
+    "should": "^12.0.0"
+  },
+  "directories": {},
+  "dist": {
+    "shasum": "72fbf0c71602a666fcdd2886bfa668418c5f2c27",
+    "size": 9914600,
+    "noattachment": false,
+    "tarball": "http://registry.npm.taobao.org/bot-sdk/download/bot-sdk-1.1.1.tgz"
+  },
+  "gitHead": "5147cc29c74758a20a5622096ec1b8fff646f636",
+  "homepage": "https://github.com/dueros/bot-sdk-node.js#readme",
+  "license": "ISC",
+  "main": "index.js",
+  "maintainers": [
+    {
+      "name": "yuanpeng",
+      "email": "yuanpeng.3007@163.com"
+    }
+  ],
+  "name": "bot-sdk",
+  "optionalDependencies": {},
+  "publish_time": 1515141736432,
+  "readme": "ERROR: No README data found!",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dueros/bot-sdk-node.js.git"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "version": "1.1.1"
+}
