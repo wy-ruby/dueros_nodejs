@@ -406,7 +406,7 @@ class Bot {
                 arr.push(this._tokenValue(t.value)); 
             }
         }
-        
+
         let str = arr.join('');
         let func = new Function('', 'return ' +  str + ';');
         return func();

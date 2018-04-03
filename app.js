@@ -24,6 +24,7 @@ app.post('/', (req, res) => {
         var b = new Bot(JSON.parse(req.rawBody));
         b.then(function(data){
             console.log(data);
+            res.send(data);
         });
         // 开启签名认证
         // 为了避免你的服务被非法请求，建议你验证请求是否来自于DuerOS

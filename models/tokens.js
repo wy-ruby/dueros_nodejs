@@ -87,7 +87,7 @@ exports.generateDeleteTokenById = function (id) {
             if (err) {
                 reject(err);
             }
-            collection.remove({"id": id}, {safe: true}, function (err, result) {
+            collection.remove({"id": id}, function (err, result) {
                 if (err) {
                     reject(err);
                 }
@@ -106,11 +106,10 @@ exports.generateGetTopicByAccessToken = function (access_token) {
             if (err) {
                 reject(err);
             }
-            collection.findOne({"token": access_token}, {safe: true}, function (err, result) {
+            collection.findOne({"token": access_token}, function (err, result) {
                 if (err) {
                     reject(err);
                 }
-                console.log(result);
                 resolve(result);
             });
         });
