@@ -1,22 +1,18 @@
 'use strict'
 
-var mqtt = require('mqtt');
+/**
+ * Polyhome Mqtt通信
+ */
+var AsyncClient = require("async-mqtt");
 
-var client;
-
-client = mqtt.connect('mqtt://123.57.139.200',{
+var asyncClient = AsyncClient.connect('mqtt://123.57.139.200', {
     username: 'polyhome',
     password: '123',
-    clientId: 'dueros_polyhome_service'
+    clientId: 'dueros_polyhome_service_01'
 });
 
-client.on('connect', function () {
-    console.log('mqtt is connected');
+asyncClient.on('connect', function () {
+    console.log('mqtt success connect');
 });
 
-client.on('message', function (topic, message) {
-    // message is Buffer
-    console.log(message.toString());
-});
-
-exports.mqttClient = client;
+module.exports = asyncClient;

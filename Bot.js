@@ -1,7 +1,7 @@
 'use strict'
 
 var BaseBot = require('./bot-sdk/lib/Bot');
-// var mqttClient = require('./poly_mqtt');
+var asyncClient = require('./poly_mqtt');
 var tokenModels = require('./models/tokens');
 var statesModels = require('./models/states');
 var usersModels = require('./models/users');
@@ -62,7 +62,7 @@ class Bot extends BaseBot {
                 });
             }
             var content = {'service': 'trigger_light_by_name', 'plugin': 'gateway','data': {'name': sence, 'action': 'turn_on'}};
-            mqttClient.publish('/v1/polyhome-ha/host/233690e739a64e58a1b9ce38b27e1f52/user_id/99/services/', JSON.stringify(content));
+            asyncClient.publish('/v1/polyhome-ha/host/233690e739a64e58a1b9ce38b27e1f52/user_id/99/services/', JSON.stringify(content));
             let card = new Bot.Card.TextCard('正在开灯');
             return new Promise(function(resolve, reject){
                     resolve({
@@ -88,7 +88,7 @@ class Bot extends BaseBot {
             }
 
             var content = {'service': 'trigger_light_by_name', 'plugin': 'gateway','data': {'name': sence, 'action': 'turn_off'}};
-            mqttClient.publish('/v1/polyhome-ha/host/233690e739a64e58a1b9ce38b27e1f52/user_id/99/services/', JSON.stringify(content));
+            asyncClient.publish('/v1/polyhome-ha/host/233690e739a64e58a1b9ce38b27e1f52/user_id/99/services/', JSON.stringify(content));
             let card = new Bot.Card.TextCard('正在关灯');
             return new Promise(function(resolve, reject){
                 resolve({
@@ -99,7 +99,7 @@ class Bot extends BaseBot {
         })
 
         /**
-         * 这里开始处理智能家居的DCS协议细节
+         * ===============这里开始处理智能家居的DCS协议细节================
          */
         if (!postData.header) return;
         console.log("payLoadVersion: " + postData.header.payloadVersion);
@@ -211,6 +211,9 @@ class Bot extends BaseBot {
                     } else if (entity_id.split('.')[0] == 'cover') {
                         let content = {'service': 'open_cover', 'plugin': entity_id.split('.')[0], 'data': {'entity_id': entity_id}};
                         return asyncClient.publish('/v1/polyhome-ha/host/' + topic + '/user_id/99/services/', JSON.stringify(content));
+                    } else if (entity_id.split('.')[0] == 'switch') {
+                        let content = {'service': 'turn_on', 'plugin': entity_id.split('.')[0], 'data': {'entity_id': entity_id}};
+                        return asyncClient.publish('/v1/polyhome-ha/host/' + topic + '/user_id/99/services/', JSON.stringify(content));
                     }
                 })
                 .then(function(data){
@@ -252,13 +255,15 @@ class Bot extends BaseBot {
                     return data.family[0].device_id;
                 })
                 .then(function(topic){
-                    console.log(topic);
                     let entity_id = postData.payload.appliance.applianceId;
                     if (entity_id.split('.')[0] == 'light') {
                         let content = {'service': 'turn_off', 'plugin': entity_id.split('.')[0],'data': {'entity_id': entity_id}};
                         return asyncClient.publish('/v1/polyhome-ha/host/' + topic + '/user_id/99/services/', JSON.stringify(content));
                     } else if (entity_id.split('.')[0] == 'cover') {
                         let content = {'service': 'close_cover', 'plugin': entity_id.split('.')[0], 'data': {'entity_id': entity_id}};
+                        return asyncClient.publish('/v1/polyhome-ha/host/' + topic + '/user_id/99/services/', JSON.stringify(content));
+                    } else if (entity_id.split('.')[0] == 'switch') {
+                        let content = {'service': 'turn_off', 'plugin': entity_id.split('.')[0], 'data': {'entity_id': entity_id}};
                         return asyncClient.publish('/v1/polyhome-ha/host/' + topic + '/user_id/99/services/', JSON.stringify(content));
                     }
                 })
@@ -380,30 +385,25 @@ class Bot extends BaseBot {
             })
         });
     };
-
-    builtSocketPayload(data) {
-
-    }
-
-    builtLightPayload(data) {
-
-    }
-
 }
 
-var AsyncClient = require("async-mqtt");
-
-var asyncClient = AsyncClient.connect('mqtt://123.57.139.200', {
-    username: 'polyhome',
-    password: '123',
-    clientId: 'dueros_polyhome_service_01'
-});
-
-asyncClient.on('connect', function () {
-    console.log('mqtt success connect');
-});
-
 module.exports = Bot;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 let test_data = {
