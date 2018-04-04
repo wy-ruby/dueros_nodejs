@@ -4,6 +4,7 @@ var BaseBot = require('./bot-sdk/lib/Bot');
 // var mqttClient = require('./poly_mqtt');
 var tokenModels = require('./models/tokens');
 var statesModels = require('./models/states');
+var usersModels = require('./models/users');
 
 class Bot extends BaseBot {
 
@@ -110,11 +111,20 @@ class Bot extends BaseBot {
             var gateway_sn = topic.split('/')[4];
             var json_data = JSON.parse(message.toString());
             if (json_data.type == 'all_states'){
-                var gw_states = {
+                let gw_states = {
                     "gw_sn": gateway_sn,
                     "states": json_data.data
                 }
                 statesModels.generateSaveStates(gw_states)
+                    .then(function(data){
+                        // console.log(data);
+                    });
+            } else if (json_data.type == 'all_automations'){
+                let gw_automations = {
+                    "gw_sn": gateway_sn,
+                    "automations": json_data.data
+                }
+                statesModels.generateSaveAutomations(gw_automations)
                     .then(function(data){
                         // console.log(data);
                     });
@@ -123,65 +133,256 @@ class Bot extends BaseBot {
         // 处理协议类型
         if (postData.header.name == "DiscoverAppliancesRequest"){
             console.log("==发现设备==");
-            var content = {'service': 'get_states', 'plugin': 'gateway','data': {}};
-            asyncClient.subscribe("/v1/polyhome-ha/host/601e5c44a4064d0c9b8e4ef49145ee10/ack/")
-                .then(function(topic){
-                    console.log(topic);
-                    return asyncClient.publish("/v1/polyhome-ha/host/601e5c44a4064d0c9b8e4ef49145ee10/user_id/99/services/", JSON.stringify(content))
+            let acc_token = postData.payload.accessToken;
+            if (acc_token == null){ 
+                acc_token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJhNGI3MGQ5Mi00YzBjLTRhNzQtOWJlMS0zODE3ODhhMjU5YTUiLCJzdWIiOjU0NywiZXhwIjoxNTIyNjY3NDE4LCJpYXQiOjE1MjI2NjM4MTh9.Y6lZtHbNj-SEBHikuxvJoskic_BxBDEszvVCr1h_yoFCBhSqLNFAE_Wjs5tdgirF7TW9kEoMT7WnTTt5DhrTjZYY7eJS_4OYjEmE55FpGaeELBmX2io0rT7ATtsV-UgUvgH22fkqMGkFpGEY_llYpX3PcoE8rtC9e81YPXFb-Tp_YwvmyYSj5HbXQ5rBHQKHCtZ5vIzP1HJXTNXx1sKVfa8U8E8e9Ui--Wa-5rt0fNsQL3Rzc6T0JcUJGUjbnVtGUrT5LaOLsC_rLnwS3JY-uBtMsVkvPcvBICXIOSy3fZP4V6-7_7Ex0_gMNXGg6cWTUfgTxs9IdKBoqymLDYY8cA";
+            }
+            let _this = this;
+            tokenModels.generateGetTopicByAccessToken(acc_token)
+                .then(function(data){
+                    return usersModels.getUserById(data.user_id);
                 })
-                .then(function(){
-                    console.log("Publish Data");
+                .then(function(data){
+                    return data.family[0].device_id;
+                })
+                .then(function(gw_sn){
+                    return asyncClient.subscribe("/v1/polyhome-ha/host/" + gw_sn + "/ack/")
+                        .then(function(){
+                            return gw_sn;
+                        });
+                })
+                .then(function(gw_sn){
+                    let content = {'service': 'get_states', 'plugin': 'gateway','data': {}};
+                    asyncClient.publish("/v1/polyhome-ha/host/" + gw_sn + "/user_id/99/services/", JSON.stringify(content))
+                        .then(function(){
+                            let content = {'service': 'get_all_automation', 'plugin': 'gateway','data': {}};
+                            return asyncClient.publish("/v1/polyhome-ha/host/" + gw_sn + "/user_id/99/services/", JSON.stringify(content))
+                        });
                 });
-            // return builtData(message.toString());
-            var _this = this
-            return statesModels.generateGetStatesBySn("601e5c44a4064d0c9b8e4ef49145ee10")
-                    .then(function(data){
-                        console.log(data);
-                        // return test_data;
-                        return _this.builtData(postData.header.messageId, data)
-                    });
+
+            return tokenModels.generateGetTopicByAccessToken(acc_token)
+                .then(function(data){
+                    return usersModels.getUserById(data.user_id);
+                })
+                .then(function(data){
+                    return data.family[0].device_id;
+                })
+                .then(function(gateway_sn){
+                    return statesModels.generateGetStatesBySn(gateway_sn);
+                })
+                .then(function(data){
+                    return _this.builtData(postData.header.messageId, data);
+                })
+                .catch(function(err){
+                    return {
+                        "header":{
+                            "namespace":"DuerOS.ConnectedHome.Control",
+                            "name":"UnsupportedTargetSettingError",
+                            "messageId":"917314cd-ca00-49ca-b75e-d6f65ac43503",
+                            "payloadVersion":"1"
+                        },
+                        "payload":{
+                        }
+                    }
+                });
         }
         if (postData.header.name == "TurnOnRequest"){
             console.log("控制打开");
-            return new Promise(function(resolve, reject){
-                resolve(test_data);
-            });
+            let acc_token = postData.payload.accessToken;
+            let message_id = postData.payload.message_id;
+            if (acc_token == null){
+                acc_token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJhNGI3MGQ5Mi00YzBjLTRhNzQtOWJlMS0zODE3ODhhMjU5YTUiLCJzdWIiOjU0NywiZXhwIjoxNTIyNjY3NDE4LCJpYXQiOjE1MjI2NjM4MTh9.Y6lZtHbNj-SEBHikuxvJoskic_BxBDEszvVCr1h_yoFCBhSqLNFAE_Wjs5tdgirF7TW9kEoMT7WnTTt5DhrTjZYY7eJS_4OYjEmE55FpGaeELBmX2io0rT7ATtsV-UgUvgH22fkqMGkFpGEY_llYpX3PcoE8rtC9e81YPXFb-Tp_YwvmyYSj5HbXQ5rBHQKHCtZ5vIzP1HJXTNXx1sKVfa8U8E8e9Ui--Wa-5rt0fNsQL3Rzc6T0JcUJGUjbnVtGUrT5LaOLsC_rLnwS3JY-uBtMsVkvPcvBICXIOSy3fZP4V6-7_7Ex0_gMNXGg6cWTUfgTxs9IdKBoqymLDYY8cA";
+            }
+            return tokenModels.generateGetTopicByAccessToken(acc_token)
+                .then(function(data){
+                    return usersModels.getUserById(data.user_id);
+                })
+                .then(function(data){
+                    return data.family[0].device_id;
+                })
+                .then(function(topic){
+                    let entity_id = postData.payload.appliance.applianceId;
+                    if (entity_id.split('.')[0] == 'automation'){
+                        let content = {'service': 'trigger', 'plugin': entity_id.split('.')[0], 'data': {'entity_id': entity_id}};
+                        return asyncClient.publish('/v1/polyhome-ha/host/' + topic + '/user_id/99/services/', JSON.stringify(content));
+                    } else if (entity_id.split('.')[0] == 'light') {
+                        let content = {'service': 'turn_on', 'plugin': entity_id.split('.')[0], 'data': {'entity_id': entity_id}};
+                        return asyncClient.publish('/v1/polyhome-ha/host/' + topic + '/user_id/99/services/', JSON.stringify(content));
+                    } else if (entity_id.split('.')[0] == 'cover') {
+                        let content = {'service': 'open_cover', 'plugin': entity_id.split('.')[0], 'data': {'entity_id': entity_id}};
+                        return asyncClient.publish('/v1/polyhome-ha/host/' + topic + '/user_id/99/services/', JSON.stringify(content));
+                    }
+                })
+                .then(function(data){
+                    return {
+                        "header": {
+                            "namespace": "DuerOS.ConnectedHome.Control",
+                            "name": "TurnOnConfirmation",
+                            "messageId": message_id,
+                            "payloadVersion": "1"
+                        },
+                        "payload": {}
+                    };
+                })
+                .catch(function(err){
+                    return {
+                        "header":{
+                            "namespace":"DuerOS.ConnectedHome.Control",
+                            "name":"UnsupportedTargetSettingError",
+                            "messageId":"917314cd-ca00-49ca-b75e-d6f65ac43503",
+                            "payloadVersion":"1"
+                        },
+                        "payload":{
+                        }
+                    }
+                });
         }
         if (postData.header.name == "TurnOffRequest"){
             console.log("控制关闭");
-            return new Promise(function(resolve, reject){
-                resolve(test_data);
-            });
+            let acc_token = postData.payload.accessToken;
+            let message_id = postData.payload.message_id;
+            if (acc_token == null){
+                acc_token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJhNGI3MGQ5Mi00YzBjLTRhNzQtOWJlMS0zODE3ODhhMjU5YTUiLCJzdWIiOjU0NywiZXhwIjoxNTIyNjY3NDE4LCJpYXQiOjE1MjI2NjM4MTh9.Y6lZtHbNj-SEBHikuxvJoskic_BxBDEszvVCr1h_yoFCBhSqLNFAE_Wjs5tdgirF7TW9kEoMT7WnTTt5DhrTjZYY7eJS_4OYjEmE55FpGaeELBmX2io0rT7ATtsV-UgUvgH22fkqMGkFpGEY_llYpX3PcoE8rtC9e81YPXFb-Tp_YwvmyYSj5HbXQ5rBHQKHCtZ5vIzP1HJXTNXx1sKVfa8U8E8e9Ui--Wa-5rt0fNsQL3Rzc6T0JcUJGUjbnVtGUrT5LaOLsC_rLnwS3JY-uBtMsVkvPcvBICXIOSy3fZP4V6-7_7Ex0_gMNXGg6cWTUfgTxs9IdKBoqymLDYY8cA";
+            }
+            return tokenModels.generateGetTopicByAccessToken(acc_token)
+                .then(function(data){
+                    return usersModels.getUserById(data.user_id);
+                })
+                .then(function(data){
+                    return data.family[0].device_id;
+                })
+                .then(function(topic){
+                    console.log(topic);
+                    let entity_id = postData.payload.appliance.applianceId;
+                    if (entity_id.split('.')[0] == 'light') {
+                        let content = {'service': 'turn_off', 'plugin': entity_id.split('.')[0],'data': {'entity_id': entity_id}};
+                        return asyncClient.publish('/v1/polyhome-ha/host/' + topic + '/user_id/99/services/', JSON.stringify(content));
+                    } else if (entity_id.split('.')[0] == 'cover') {
+                        let content = {'service': 'close_cover', 'plugin': entity_id.split('.')[0], 'data': {'entity_id': entity_id}};
+                        return asyncClient.publish('/v1/polyhome-ha/host/' + topic + '/user_id/99/services/', JSON.stringify(content));
+                    }
+                })
+                .then(function(data){
+                    return {
+                        "header": {
+                            "namespace": "DuerOS.ConnectedHome.Control",
+                            "name": "TurnOffConfirmation",
+                            "messageId": message_id,
+                            "payloadVersion": "1"
+                        },
+                        "payload": {}
+                    };
+                })
+                .catch(function(err){
+                    return {
+                        "header":{
+                            "namespace":"DuerOS.ConnectedHome.Control",
+                            "name":"UnsupportedTargetSettingError",
+                            "messageId":"917314cd-ca00-49ca-b75e-d6f65ac43503",
+                            "payloadVersion":"1"
+                        },
+                        "payload":{
+                        }
+                    }
+                });
         }
     }
 
     builtData(msg_id, data) {
         let data_header = {
-            "header": {
-                　　    "namespace": "DuerOS.ConnectedHome.Discovery",
-                　　    "name": "DiscoverAppliancesResponse",
-                　　    "messageId": msg_id,
-                　　    "payloadVersion": "1"
-                　　},
+    　　    "namespace": "DuerOS.ConnectedHome.Discovery",
+    　　    "name": "DiscoverAppliancesResponse",
+    　　    "messageId": msg_id,
+    　　    "payloadVersion": "1"  　　
         }
         let discovered_appliances = []
         data.states.forEach(state => {
-            console.log(state)
+            if (state.entity_id.split('.')[0] == 'light'){
+                let dev_state = {
+                    "actions": ["turnOn", "turnOff"],
+                    "applianceTypes": ["SWITCH"],
+                    "additionalApplianceDetails": {},
+                    "applianceId": state.entity_id,
+                    "friendlyDescription": "PolyHome智能灯控开关",
+                    "friendlyName": state.attributes.friendly_name,
+                    "isReachable": true,
+                    "manufacturerName": "PolyHome",
+                    "modelName": state.attributes.platform,
+                    "version": "0.1"
+                };
+                discovered_appliances.push(dev_state);
+            } else if (state.entity_id.split('.')[0] == 'switch'){
+                let dev_state = {
+                    "actions": ["turnOn", "turnOff"],
+                    "applianceTypes": ["SOCKET"],
+                    "additionalApplianceDetails": {},
+                    "applianceId": state.entity_id,
+                    "friendlyDescription": "PolyHome智能灯控开关",
+                    "friendlyName": state.attributes.friendly_name,
+                    "isReachable": true,
+                    "manufacturerName": "PolyHome",
+                    "modelName": state.attributes.platform,
+                    "version": "0.1"
+                };
+                discovered_appliances.push(dev_state);
+            } else if (state.entity_id.split('.')[0] == 'cover'){
+                let dev_state = {
+                    "actions": ["turnOn", "turnOff"],
+                    "applianceTypes": ["SOCKET"],
+                    "additionalApplianceDetails": {},
+                    "applianceId": state.entity_id,
+                    "friendlyDescription": "PolyHome智能灯控开关",
+                    "friendlyName": state.attributes.friendly_name,
+                    "isReachable": true,
+                    "manufacturerName": "PolyHome",
+                    "modelName": state.attributes.platform,
+                    "version": "0.1"
+                };
+                discovered_appliances.push(dev_state);
+            }
         });
+        data.automations.forEach(data => {
+            let dev_state = {
+                "actions": ["turnOn", "turnOff"],
+                "applianceTypes": ["SCENE_TRIGGER"],
+                "additionalApplianceDetails": {},
+                "applianceId": data.entity_id,
+                "friendlyDescription": "PolyHome智能情景",
+                "friendlyName": data.attributes.friendly_name,
+                "isReachable": true,
+                "manufacturerName": "PolyHome",
+                "modelName": data.attributes.id,
+                "version": "0.1"
+            };
+            discovered_appliances.push(dev_state);
+        })
         let data_payload = {
-            "discoveredAppliances": [],
-            "discoveredGroups": []
+            "discoveredAppliances": discovered_appliances,
+            "discoveredGroups": [{
+                "groupName": "卧室",
+                "applianceIds": [
+                    "004",
+                    "005",
+                    "006"
+                ],
+                "groupNotes": "卧室空调的分组控制",
+                "additionalGroupDetails": {
+                    "extraDetail1": "detail about the group",
+                    "extraDetail2": "another detail about group",
+                    "extraDetail3": "only be used for reference group."
+                }
+            }]
         }
         return new Promise(function(resolve, reject){
             resolve({
-                data_header,
-                data_payload
+                "header": data_header,
+                "payload": data_payload
             })
         });
     };
 
     builtSocketPayload(data) {
-        
+
     }
 
     builtLightPayload(data) {
@@ -189,6 +390,21 @@ class Bot extends BaseBot {
     }
 
 }
+
+var AsyncClient = require("async-mqtt");
+
+var asyncClient = AsyncClient.connect('mqtt://123.57.139.200', {
+    username: 'polyhome',
+    password: '123',
+    clientId: 'dueros_polyhome_service_01'
+});
+
+asyncClient.on('connect', function () {
+    console.log('mqtt success connect');
+});
+
+module.exports = Bot;
+
 
 let test_data = {
     　　"header": {
@@ -198,75 +414,7 @@ let test_data = {
     　　    "payloadVersion": "1"
     　　},
     　　"payload": {
-    　　  　"discoveredAppliances": [
-    　　  　  　{
-    　　  　  　  　"actions": [
-    　　  　  　  　  　"turnOn",
-    　　  　  　  　  　"turnOff",
-    　　  　  　  　  　"incrementBrightnessPercentage",
-    　　  　  　  　  　"decrementBrightnessPercentage"
-    　　  　  　  　],
-    　　  　  　  　"applianceTypes": [
-    　　  　  　  　  　"LIGHT"
-    　　  　  　  　],
-    　　  　  　  　"additionalApplianceDetails": {
-    　　  　  　  　  　"extraDetail1": "optionalDetailForSkillAdapterToReferenceThisDevice",
-    　　  　  　  　  　"extraDetail2": "There can be multiple entries",
-    　　  　  　  　  　"extraDetail3": "but they should only be used for reference purposes.",
-    　　  　  　  　  　"extraDetail4": "This is not a suitable place to maintain current device state"
-    　　  　  　  　},
-    　　  　  　  　"applianceId": "light.light3046",
-    　　  　  　  　"friendlyDescription": "PolyHome智能零火灯",
-    　　  　  　  　"friendlyName": "主卧的灯",
-    　　  　  　  　"isReachable": true,
-    　　  　  　  　"manufacturerName": "PolyHome",
-    　　  　  　  　"modelName": "LnLight",
-    　　  　  　  　"version": "your software version number here."
-    　　  　  　},
-    　　  　  　{
-    　　  　  　  　"actions": [
-    　　  　  　  　  　"turnOn",
-    　　  　  　  　  　"turnOff"
-    　　  　  　  　],
-    　　  　  　  　"applianceTypes": [
-    　　  　  　  　  　"CURTAIN"
-    　　  　  　  　],
-    　　  　  　  　"additionalApplianceDetails": {
-    　　  　  　  　  　"extraDetail1": "optionalDetailForSkillAdapterToReferenceThisDevice",
-    　　  　  　  　  　"extraDetail2": "There can be multiple entries",
-    　　  　  　  　  　"extraDetail3": "but they should only be used for reference purposes.",
-    　　  　  　  　  　"extraDetail4": "This is not a suitable place to maintain current device state"
-    　　  　  　  　},
-    　　  　  　  　"applianceId": "uniqueSwitchDeviceId",
-    　　  　  　  　"friendlyDescription": "展现给用户的详细介绍",
-    　　  　  　  　"friendlyName": "卧室的窗帘",
-    　　  　  　  　"isReachable": true,
-    　　  　  　  　"manufacturerName": "设备制造商的名称",
-    　　  　  　  　"modelName": "fancyCurtain",
-    　　  　  　  　"version": "your software version number here."
-    　　  　  　},
-    　　  　  　{
-    　　  　  　  　"actions": [
-    　　  　  　  　  　"turnOn",
-    　　  　  　  　  　"turnOff"
-    　　  　  　  　],
-    　　  　  　  　"applianceTypes": [
-    　　  　  　  　  　"SCENE_TRIGGER"
-    　　  　  　  　],
-    　　  　  　  　"additionalApplianceDetails": {
-    　　  　  　  　  　"extraDetail1": "detail about the scene",
-    　　  　  　  　  　"extraDetail2": "another detail about scene",
-    　　  　  　  　  　"extraDetail3": "only be used for reference purposes."
-    　　  　  　  　},
-    　　  　  　  　"applianceId": "uniqueDeviceId",
-    　　  　  　  　"friendlyDescription": "来自设备商的场景",
-    　　  　  　  　"friendlyName": "回家模式",
-    　　  　  　  　"isReachable": true,
-    　　  　  　  　"manufacturerName": "yourManufacturerName",
-    　　  　  　  　"modelName": "提供场景的设备型号",
-    　　  　  　  　"version": "your software version number here."
-    　　  　  　}
-    　　  　],
+    　　  　"discoveredAppliances": [],
     　　    "discoveredGroups": [
                 {
                     "groupName": "客厅",
@@ -281,57 +429,7 @@ let test_data = {
                         "extraDetail2": "another detail about group",
                         "extraDetail3": "only be used for reference group."
                      }
-                },
-                {
-                    "groupName": "卧室",
-                    "applianceIds": [
-                        "004",
-                        "005",
-                        "006"
-                    ],
-                    "groupNotes": "卧室空调的分组控制",
-                    "additionalGroupDetails": {
-                        "extraDetail1": "detail about the group",
-                        "extraDetail2": "another detail about group",
-                        "extraDetail3": "only be used for reference group."
-                    }
                 }
              ]
     　　}
     };
-
-// var mqtt = require('mqtt');
-var AsyncClient = require("async-mqtt");
-
-var asyncClient = AsyncClient.connect('mqtt://123.57.139.200', {
-    username: 'polyhome',
-    password: '123',
-    clientId: 'dueros_polyhome_service_01'
-});
-
-asyncClient.on('connect', function () {
-    console.log('mqtt success connect');
-});
-
-// var asyncClient = new AsyncClient(client);
-
-// client.on('connect', function () {
-//     console.log('mqtt success connect');
-// });
-
-// var client = mqtt.connect('mqtt://123.57.139.200', {
-//     username: 'polyhome',
-//     password: '123',
-//     clientId: 'dueros_polyhome_service'
-// });
-
-// client.on('connect', function () {
-//     console.log('mqtt success connect');
-// });
-
-// client.on('message', function (topic, message) {
-//     // message is Buffer
-//     console.log(message.toString());
-// });
-
-module.exports = Bot;
