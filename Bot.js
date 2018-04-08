@@ -1,13 +1,17 @@
 'use strict'
 
 const BaseBot = require('./bot-sdk/lib/Bot');
-const asyncClient = require('./poly_mqtt');
+const asyncClient = require('./utils/poly_mqtt');
 const tokenModels = require('./models/tokens');
 const statesModels = require('./models/states');
 const usersModels = require('./models/users');
 const discoverSkill = require('./skills/skill_discovery');
 const turnOnSkill = require('./skills/skill_turnon');
 const turnOffSkill = require('./skills/skill_turnoff');
+const getStatusSkill = require('./skills/skill_getrunstatus');
+const getPM25Skill = require('./skills/skill_pm25');
+const getCO2Skill = require('./skills/skill_co2');
+const getHumiditySkill = require('./skills/skill_gethumidity');
 
 class Bot extends BaseBot {
 
@@ -109,109 +113,26 @@ class Bot extends BaseBot {
         console.log("token: "          + postData.payload.accessToken);
 
         // 处理协议类型
-        if (postData.header.name == "DiscoverAppliancesRequest"){
-            return discoverSkill.DiscoverHandler(postData, asyncClient);
-        }
-        if (postData.header.name == "TurnOnRequest"){
-            return turnOnSkill.TurnOnHandler(postData, asyncClient);
-        }
-        if (postData.header.name == "TurnOffRequest"){
-            return turnOffSkill.TurnOffHandler(postData, asyncClient);
+        switch (postData.header.name) {
+            case "DiscoverAppliancesRequest":
+            return discoverSkill.RequestHandler(postData, asyncClient);
+            break;
+            case "TurnOnRequest":
+            return turnOnSkill.RequestHandler(postData, asyncClient);
+            break;
+            case "TurnOffRequest":
+            return turnOffSkill.RequestHandler(postData, asyncClient);
+            break;
+            case "GetAirPM25Request":
+            return getPM25Skill.RequestHandler(postData, asyncClient);
+            break;
+            case "GetHumidityRequest":
+            return getHumiditySkill.RequestHandler(postData, asyncClient);
+            break;
+            default:
+            console.log(postData.header.name);
         }
     }
-
-    builtData(msg_id, data) {
-        let data_header = {
-    　　    "namespace": "DuerOS.ConnectedHome.Discovery",
-    　　    "name": "DiscoverAppliancesResponse",
-    　　    "messageId": msg_id,
-    　　    "payloadVersion": "1"  　　
-        }
-        let discovered_appliances = []
-        data.states.forEach(state => {
-            if (state.entity_id.split('.')[0] == 'light'){
-                let dev_state = {
-                    "actions": ["turnOn", "turnOff"],
-                    "applianceTypes": ["SWITCH"],
-                    "additionalApplianceDetails": {},
-                    "applianceId": state.entity_id,
-                    "friendlyDescription": "PolyHome智能灯控开关",
-                    "friendlyName": state.attributes.friendly_name,
-                    "isReachable": true,
-                    "manufacturerName": "PolyHome",
-                    "modelName": state.attributes.platform,
-                    "version": "0.1"
-                };
-                discovered_appliances.push(dev_state);
-            } else if (state.entity_id.split('.')[0] == 'switch'){
-                let dev_state = {
-                    "actions": ["turnOn", "turnOff"],
-                    "applianceTypes": ["SOCKET"],
-                    "additionalApplianceDetails": {},
-                    "applianceId": state.entity_id,
-                    "friendlyDescription": "PolyHome智能灯控开关",
-                    "friendlyName": state.attributes.friendly_name,
-                    "isReachable": true,
-                    "manufacturerName": "PolyHome",
-                    "modelName": state.attributes.platform,
-                    "version": "0.1"
-                };
-                discovered_appliances.push(dev_state);
-            } else if (state.entity_id.split('.')[0] == 'cover'){
-                let dev_state = {
-                    "actions": ["turnOn", "turnOff"],
-                    "applianceTypes": ["SOCKET"],
-                    "additionalApplianceDetails": {},
-                    "applianceId": state.entity_id,
-                    "friendlyDescription": "PolyHome智能灯控开关",
-                    "friendlyName": state.attributes.friendly_name,
-                    "isReachable": true,
-                    "manufacturerName": "PolyHome",
-                    "modelName": state.attributes.platform,
-                    "version": "0.1"
-                };
-                discovered_appliances.push(dev_state);
-            }
-        });
-        data.automations.forEach(data => {
-            let dev_state = {
-                "actions": ["turnOn", "turnOff"],
-                "applianceTypes": ["SCENE_TRIGGER"],
-                "additionalApplianceDetails": {},
-                "applianceId": data.entity_id,
-                "friendlyDescription": "PolyHome智能情景",
-                "friendlyName": data.attributes.friendly_name,
-                "isReachable": true,
-                "manufacturerName": "PolyHome",
-                "modelName": data.attributes.id,
-                "version": "0.1"
-            };
-            discovered_appliances.push(dev_state);
-        })
-        let data_payload = {
-            "discoveredAppliances": discovered_appliances,
-            "discoveredGroups": [{
-                "groupName": "卧室",
-                "applianceIds": [
-                    "004",
-                    "005",
-                    "006"
-                ],
-                "groupNotes": "卧室空调的分组控制",
-                "additionalGroupDetails": {
-                    "extraDetail1": "detail about the group",
-                    "extraDetail2": "another detail about group",
-                    "extraDetail3": "only be used for reference group."
-                }
-            }]
-        }
-        return new Promise(function(resolve, reject){
-            resolve({
-                "header": data_header,
-                "payload": data_payload
-            })
-        });
-    };
 }
 
 module.exports = Bot;

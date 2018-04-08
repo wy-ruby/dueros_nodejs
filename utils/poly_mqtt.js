@@ -4,12 +4,13 @@
  * Polyhome Mqtt通信
  */
 const AsyncClient = require("async-mqtt");
-const statesModels = require('./models/states');
+const statesModels = require('../models/states');
+const config = require('../config/index');
 
-var asyncClient = AsyncClient.connect('mqtt://123.57.139.200', {
-    username: 'polyhome',
-    password: '123',
-    clientId: 'dueros_polyhome_service_01'
+var asyncClient = AsyncClient.connect(config.mqtt_config.url, {
+    username: config.mqtt_config.username,
+    password: config.mqtt_config.password,
+    clientId: config.mqtt_config.clinet_id
 });
 
 asyncClient.on('connect', function () {
