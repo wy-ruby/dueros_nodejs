@@ -133,51 +133,105 @@ class Bot extends BaseBot {
             console.log(postData.header.name);
         }
     }
+<<<<<<< HEAD
+=======
+
+    builtData(msg_id, data) {
+        let data_header = {
+    　　    "namespace": "DuerOS.ConnectedHome.Discovery",
+    　　    "name": "DiscoverAppliancesResponse",
+    　　    "messageId": msg_id,
+    　　    "payloadVersion": "1"  　　
+        }
+        let discovered_appliances = []
+        //对设备的处理
+        data.states.forEach(state => {
+            if (state.entity_id.split('.')[0] == 'light'){
+                let dev_state = {
+                    "actions": ["turnOn", "turnOff"],
+                    "applianceTypes": ["SWITCH"],
+                    "additionalApplianceDetails": {},
+                    "applianceId": state.entity_id,
+                    "friendlyDescription": "PolyHome智能灯控开关",
+                    "friendlyName": state.attributes.friendly_name,
+                    "isReachable": true,
+                    "manufacturerName": "PolyHome",
+                    "modelName": state.attributes.platform,
+                    "version": "0.1"
+                };
+                discovered_appliances.push(dev_state);
+            } else if (state.entity_id.split('.')[0] == 'switch'){
+                let dev_state = {
+                    "actions": ["turnOn", "turnOff"],
+                    "applianceTypes": ["SOCKET"],
+                    "additionalApplianceDetails": {},
+                    "applianceId": state.entity_id,
+                    "friendlyDescription": "PolyHome智能灯控开关",
+                    "friendlyName": state.attributes.friendly_name,
+                    "isReachable": true,
+                    "manufacturerName": "PolyHome",
+                    "modelName": state.attributes.platform,
+                    "version": "0.1"
+                };
+                discovered_appliances.push(dev_state);
+            } else if (state.entity_id.split('.')[0] == 'cover'){
+                let dev_state = {
+                    "actions": ["turnOn", "turnOff"],
+                    "applianceTypes": ["SOCKET"],
+                    "additionalApplianceDetails": {},
+                    "applianceId": state.entity_id,
+                    "friendlyDescription": "PolyHome智能灯控开关",
+                    "friendlyName": state.attributes.friendly_name,
+                    "isReachable": true,
+                    "manufacturerName": "PolyHome",
+                    "modelName": state.attributes.platform,
+                    "version": "0.1"
+                };
+                discovered_appliances.push(dev_state);
+            }
+        });
+        //对场景的处理
+        data.automations.forEach(data => {
+            let dev_state = {
+                "actions": ["turnOn", "turnOff"],
+                "applianceTypes": ["SCENE_TRIGGER"],
+                "additionalApplianceDetails": {},
+                "applianceId": data.entity_id,
+                "friendlyDescription": "PolyHome智能情景",
+                "friendlyName": data.attributes.friendly_name,
+                "isReachable": true,
+                "manufacturerName": "PolyHome",
+                "modelName": data.attributes.id,
+                "version": "0.1"
+            };
+            discovered_appliances.push(dev_state);
+        })
+        //包装成百度那里要求的格式的内容
+        let data_payload = {
+            "discoveredAppliances": discovered_appliances,
+            "discoveredGroups": [{
+                "groupName": "卧室",
+                "applianceIds": [
+                    "004",
+                    "005",
+                    "006"
+                ],
+                "groupNotes": "卧室空调的分组控制",
+                "additionalGroupDetails": {
+                    "extraDetail1": "detail about the group",
+                    "extraDetail2": "another detail about group",
+                    "extraDetail3": "only be used for reference group."
+                }
+            }]
+        }
+        return new Promise(function(resolve, reject){
+            resolve({
+                "header": data_header,
+                "payload": data_payload
+            })
+        });
+    };
+>>>>>>> 5e7ffa5bef964d4373c5790e9b6a302d32f7b182
 }
 
 module.exports = Bot;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-let test_data = {
-    　　"header": {
-    　　    "namespace": "DuerOS.ConnectedHome.Discovery",
-    　　    "name": "DiscoverAppliancesResponse",
-    　　    "messageId": "64ddf1a9eb0144c6a05b2ae97248f2e7_0_Smarthome_5ac32fd04debe0.76117120",
-    　　    "payloadVersion": "1"
-    　　},
-    　　"payload": {
-    　　  　"discoveredAppliances": [],
-    　　    "discoveredGroups": [
-                {
-                    "groupName": "客厅",
-                    "applianceIds": [
-                        "001",
-                        "002",
-                        "003"
-                    ],
-                    "groupNotes": "客厅照明分组控制",
-                    "additionalGroupDetails": {
-                        "extraDetail1": "detail about the group",
-                        "extraDetail2": "another detail about group",
-                        "extraDetail3": "only be used for reference group."
-                     }
-                }
-             ]
-    　　}
-    };
