@@ -8,6 +8,10 @@ const usersModels = require('./models/users');
 const discoverSkill = require('./skills/skill_discovery');
 const turnOnSkill = require('./skills/skill_turnon');
 const turnOffSkill = require('./skills/skill_turnoff');
+const tvControllerSkill = require('./skills/skill_tvcontroller');
+const airConditionerTemperatureSkill = require('./skills/skill_airconditionertemperature');
+const airConditionerSpeedSkill = require('./skills/skill_airconditionerspeed');
+const airConditionerModeSkill = require('./skills/skill_airconditionermode');
 
 class Bot extends BaseBot {
 
@@ -118,6 +122,23 @@ class Bot extends BaseBot {
         if (postData.header.name == "TurnOffRequest"){
             return turnOffSkill.TurnOffHandler(postData, asyncClient);
         }
+        //对电视的上/下一频道，音量大小调节进行处理
+        if (postData.header.name == "IncrementTVChannelRequest" || postData.header.name == "DecrementTVChannelRequest" || postData.header.name == "IncrementVolumeRequest" || postData.header.name == "DecrementVolumeRequest"){
+            return tvControllerSkill.TVHandler(postData, asyncClient);
+        }
+        //对空调的控制之温度的调节
+        if (postData.header.name == "IncrementTemperatureRequest" || postData.header.name == "DecrementTemperatureConfirmation"){
+            return airConditionerTemperatureSkill.AirConditionerTemperatureHandler(postData, asyncClient);
+        }
+        //对空调的控制之风速的调节
+        if (postData.header.name == "IncrementFanSpeedRequest" || postData.header.name == "DecrementFanSpeedRequest"){
+            return airConditionerSpeedSkill.AirConditionerSpeedHandler(postData, asyncClient);
+        }
+        //对空调的控制之模式的调节
+        if (postData.header.name == "SetModeRequest"){
+            return airConditionerModeSkill.AirConditionerModeHandler(postData, asyncClient);
+        }
+
     }
 
     builtData(msg_id, data) {

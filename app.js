@@ -30,7 +30,7 @@ app.post('/', (req, res) => {
         // 为了避免你的服务被非法请求，建议你验证请求是否来自于DuerOS
         // b.initCertificate(req.headers, req.rawBody).enableVerifyRequestSign();
     });
-}).listen(8015);
+}).listen(2019);
 
-console.log('DuerOS Services Listen On 8015');
+console.log('DuerOS Services Listen On 2019');
 
