@@ -1,7 +1,8 @@
 'use strict'
 
 const express = require('express');
-const Bot = require('./Bot');
+const Bot = require('./bot');
+const config = require('./config/index');
 
 var app = express();
 
@@ -30,7 +31,8 @@ app.post('/', (req, res) => {
         // 为了避免你的服务被非法请求，建议你验证请求是否来自于DuerOS
         // b.initCertificate(req.headers, req.rawBody).enableVerifyRequestSign();
     });
-}).listen(2019);
 
-console.log('DuerOS Services Listen On 2019');
+}).listen(config.app_config.port);
+
+console.log('DuerOS Services Listen On ' + config.app_config.port);
 

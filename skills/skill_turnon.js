@@ -7,7 +7,7 @@ var usersModels = require('../models/users');
 /**
  * TurnOnRequest技能处理
  */
-exports.TurnOnHandler = function(postData, asyncClient){
+exports.RequestHandler = function(postData, asyncClient){
     console.log("控制打开");
     
     let acc_token = postData.payload.accessToken;
