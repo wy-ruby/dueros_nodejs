@@ -50,7 +50,7 @@ exports.RequestHandler = function(postData, asyncClient){
                 "header":{
                     "namespace":"DuerOS.ConnectedHome.Control",
                     "name":"UnsupportedTargetSettingError",
-                    "messageId":"917314cd-ca00-49ca-b75e-d6f65ac43503",
+                    "messageId": message_id,
                     "payloadVersion":"1"
                 },
                 "payload":{}

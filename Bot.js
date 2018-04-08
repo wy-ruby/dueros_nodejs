@@ -141,26 +141,24 @@ class Bot extends BaseBot {
             case "GetHumidityRequest":
                 return getHumiditySkill.RequestHandler(postData, asyncClient);
                 break;
+            case "SetModeRequest":
+                return airConditionerModeSkill.RequestHandler(postData, asyncClient);
+                break;
+            case "IncrementFanSpeedRequest", "DecrementFanSpeedRequest":
+                //对空调的控制之风速的调节
+                return airConditionerSpeedSkill.RequestHandler(postData, asyncClient);
+                break;
+            case "IncrementTemperatureRequest", "DecrementTemperatureConfirmation":
+                //对空调的控制之温度的调节
+                return airConditionerTemperatureSkill.RequestHandler(postData, asyncClient);
+                break;
+            case "IncrementTVChannelRequest", "DecrementTVChannelRequest", "IncrementVolumeRequest", "DecrementVolumeRequest":
+                //对电视的上/下一频道，音量大小调节进行处理
+                return tvControllerSkill.RequestHandler(postData, asyncClient);
+                break;
             default:
                 console.log(postData.header.name);
         }
-        //对电视的上/下一频道，音量大小调节进行处理
-        if (postData.header.name == "IncrementTVChannelRequest" || postData.header.name == "DecrementTVChannelRequest" || postData.header.name == "IncrementVolumeRequest" || postData.header.name == "DecrementVolumeRequest") {
-            return tvControllerSkill.RequestHandler(postData, asyncClient);
-        }
-        //对空调的控制之温度的调节
-        if (postData.header.name == "IncrementTemperatureRequest" || postData.header.name == "DecrementTemperatureConfirmation") {
-            return airConditionerTemperatureSkill.RequestHandler(postData, asyncClient);
-        }
-        //对空调的控制之风速的调节
-        if (postData.header.name == "IncrementFanSpeedRequest" || postData.header.name == "DecrementFanSpeedRequest") {
-            return airConditionerSpeedSkill.RequestHandler(postData, asyncClient);
-        }
-        //对空调的控制之模式的调节
-        if (postData.header.name == "SetModeRequest") {
-            return airConditionerModeSkill.RequestHandler(postData, asyncClient);
-        }
-
     }
 }
 
