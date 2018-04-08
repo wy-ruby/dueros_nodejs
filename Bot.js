@@ -128,6 +128,7 @@ class Bot extends BaseBot {
     　　    "payloadVersion": "1"  　　
         }
         let discovered_appliances = []
+        //对设备的处理
         data.states.forEach(state => {
             if (state.entity_id.split('.')[0] == 'light'){
                 let dev_state = {
@@ -173,6 +174,7 @@ class Bot extends BaseBot {
                 discovered_appliances.push(dev_state);
             }
         });
+        //对场景的处理
         data.automations.forEach(data => {
             let dev_state = {
                 "actions": ["turnOn", "turnOff"],
@@ -188,6 +190,7 @@ class Bot extends BaseBot {
             };
             discovered_appliances.push(dev_state);
         })
+        //包装成百度那里要求的格式的内容
         let data_payload = {
             "discoveredAppliances": discovered_appliances,
             "discoveredGroups": [{
@@ -215,48 +218,3 @@ class Bot extends BaseBot {
 }
 
 module.exports = Bot;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-let test_data = {
-    　　"header": {
-    　　    "namespace": "DuerOS.ConnectedHome.Discovery",
-    　　    "name": "DiscoverAppliancesResponse",
-    　　    "messageId": "64ddf1a9eb0144c6a05b2ae97248f2e7_0_Smarthome_5ac32fd04debe0.76117120",
-    　　    "payloadVersion": "1"
-    　　},
-    　　"payload": {
-    　　  　"discoveredAppliances": [],
-    　　    "discoveredGroups": [
-                {
-                    "groupName": "客厅",
-                    "applianceIds": [
-                        "001",
-                        "002",
-                        "003"
-                    ],
-                    "groupNotes": "客厅照明分组控制",
-                    "additionalGroupDetails": {
-                        "extraDetail1": "detail about the group",
-                        "extraDetail2": "another detail about group",
-                        "extraDetail3": "only be used for reference group."
-                     }
-                }
-             ]
-    　　}
-    };

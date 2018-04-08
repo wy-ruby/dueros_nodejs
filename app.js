@@ -1,7 +1,7 @@
 'use strict'
 
 const express = require('express');
-const Bot = require('./bot');
+const Bot = require('./Bot');
 
 var app = express();
 
