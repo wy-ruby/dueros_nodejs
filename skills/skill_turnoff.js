@@ -1,13 +1,13 @@
 'use strict'
 
-var tokenModels = require('./models/tokens');
-var statesModels = require('./models/states');
-var usersModels = require('./models/users');
+var tokenModels = require('../models/tokens');
+var statesModels = require('../models/states');
+var usersModels = require('../models/users');
 
 /**
  * TurnOnRequest技能处理
  */
-exports.DiscoverHandler = function(postdata, mqttclient){
+exports.TurnOffHandler = function(postData, asyncClient){
     console.log("控制关闭");
     let acc_token = postData.payload.accessToken;
     let message_id = postData.payload.message_id;
@@ -53,8 +53,7 @@ exports.DiscoverHandler = function(postdata, mqttclient){
                     "messageId":"917314cd-ca00-49ca-b75e-d6f65ac43503",
                     "payloadVersion":"1"
                 },
-                "payload":{
-                }
+                "payload":{}
             }
         });
 }
