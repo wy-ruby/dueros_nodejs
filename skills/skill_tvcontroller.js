@@ -7,7 +7,7 @@ var usersModels = require('../models/users');
 /**
  * DiscoverAppliancesRequest技能处理
  */
-exports.TVHandler = function(postData, asyncClient){
+exports.RequestHandler = function(postData, asyncClient){
     console.log("控制关闭");
     let acc_token = postData.payload.accessToken;
     let message_id = postData.header.messageId;

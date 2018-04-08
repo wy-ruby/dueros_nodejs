@@ -146,19 +146,19 @@ class Bot extends BaseBot {
         }
         //对电视的上/下一频道，音量大小调节进行处理
         if (postData.header.name == "IncrementTVChannelRequest" || postData.header.name == "DecrementTVChannelRequest" || postData.header.name == "IncrementVolumeRequest" || postData.header.name == "DecrementVolumeRequest") {
-            return tvControllerSkill.TVHandler(postData, asyncClient);
+            return tvControllerSkill.RequestHandler(postData, asyncClient);
         }
         //对空调的控制之温度的调节
         if (postData.header.name == "IncrementTemperatureRequest" || postData.header.name == "DecrementTemperatureConfirmation") {
-            return airConditionerTemperatureSkill.AirConditionerTemperatureHandler(postData, asyncClient);
+            return airConditionerTemperatureSkill.RequestHandler(postData, asyncClient);
         }
         //对空调的控制之风速的调节
         if (postData.header.name == "IncrementFanSpeedRequest" || postData.header.name == "DecrementFanSpeedRequest") {
-            return airConditionerSpeedSkill.AirConditionerSpeedHandler(postData, asyncClient);
+            return airConditionerSpeedSkill.RequestHandler(postData, asyncClient);
         }
         //对空调的控制之模式的调节
         if (postData.header.name == "SetModeRequest") {
-            return airConditionerModeSkill.AirConditionerModeHandler(postData, asyncClient);
+            return airConditionerModeSkill.RequestHandler(postData, asyncClient);
         }
 
     }

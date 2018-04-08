@@ -9,7 +9,7 @@ var usersModels = require('../models/users');
  */
 exports.RequestHandler = function(postData, asyncClient){
     console.log("增加音量++");
-    
+
     let acc_token = postData.payload.accessToken;
     let message_id = postData.header.messageId;
     let delta_value = postData.payload.deltaValue;
