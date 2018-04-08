@@ -14,6 +14,7 @@ exports.RequestHandler = function(postData, asyncClient){
     //要调整的温度的值
     let temperature_num = postData.payload.deltaValue.value;
     let action_name = postData.header.name;
+    console.log(postData)
     let return_name = "";
     if (acc_token == null){
         acc_token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJhNGI3MGQ5Mi00YzBjLTRhNzQtOWJlMS0zODE3ODhhMjU5YTUiLCJzdWIiOjU0NywiZXhwIjoxNTIyNjY3NDE4LCJpYXQiOjE1MjI2NjM4MTh9.Y6lZtHbNj-SEBHikuxvJoskic_BxBDEszvVCr1h_yoFCBhSqLNFAE_Wjs5tdgirF7TW9kEoMT7WnTTt5DhrTjZYY7eJS_4OYjEmE55FpGaeELBmX2io0rT7ATtsV-UgUvgH22fkqMGkFpGEY_llYpX3PcoE8rtC9e81YPXFb-Tp_YwvmyYSj5HbXQ5rBHQKHCtZ5vIzP1HJXTNXx1sKVfa8U8E8e9Ui--Wa-5rt0fNsQL3Rzc6T0JcUJGUjbnVtGUrT5LaOLsC_rLnwS3JY-uBtMsVkvPcvBICXIOSy3fZP4V6-7_7Ex0_gMNXGg6cWTUfgTxs9IdKBoqymLDYY8cA";
@@ -27,21 +28,21 @@ exports.RequestHandler = function(postData, asyncClient){
         })
         .then(function(topic){
             let entity_id = postData.payload.appliance.applianceId;
+            let command_num = ((parseInt(temperature_num)-16)+42)+"";
             if(action_name == "IncrementTemperatureRequest"){
                 return_name = "IncrementTemperatureConfirmation";
-                if (entity_id.split('.')[0] == 'light') {
-                    var content = {'service': 'turn_off', 'plugin': entity_id.split('.')[0],'data': {'entity_id': entity_id}};
-                } else if (entity_id.split('.')[0] == 'cover') {
-                    var content = {'service': 'turn_off', 'plugin': entity_id.split('.')[0],'data': {'entity_id': entity_id}};
+                if (entity_id.split('.')[0] == 'remote') {
+                    var content = {'service': 'send_command', 'plugin': entity_id.split('.')[0], 'data': {'entity_id': entity_id, 'command': [command_num]}};
                 }
             }else if(action_name == "DecrementTemperatureRequest"){
-                return_name = "IncrementTemperatureConfirmation";
-                if (entity_id.split('.')[0] == 'light') {
-                    var content = {'service': 'turn_off', 'plugin': entity_id.split('.')[0],'data': {'entity_id': entity_id}};
-                } else if (entity_id.split('.')[0] == 'cover') {
-                    var content = {'service': 'turn_off', 'plugin': entity_id.split('.')[0],'data': {'entity_id': entity_id}};
+                return_name = "DecrementTemperatureConfirmation";
+                if (entity_id.split('.')[0] == 'remote') {
+                    var content = {'service': 'send_command', 'plugin': entity_id.split('.')[0], 'data': {'entity_id': entity_id, 'command': [command_num]}};
                 }
+            }else{
+                throw new Error("Not Support");
             }
+            console.log(JSON.stringify(content));
             return asyncClient.publish('/v1/polyhome-ha/host/' + topic + '/user_id/99/services/', JSON.stringify(content));
         })
         .then(function(data){

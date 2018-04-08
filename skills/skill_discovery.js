@@ -157,6 +157,21 @@ var builtData = function builtData(msg_id, data) {
                 };
                 discovered_appliances.push(dev_state);
             }
+        }else if (state.entity_id.split('.')[0] == 'remote'){
+            let dev_state = {
+                "actions": ["incrementVolume", "decrementVolume", "setVolume", "incrementTemperature"
+                    , "decrementTemperature", "setTemperature", "decrementTVChannel", "incrementTVChannel", "setMode"],
+                "applianceTypes": ["TV_SET", "AIR_CONDITION"],
+                "additionalApplianceDetails": {},
+                "applianceId": state.entity_id,
+                "friendlyDescription": "PolyHome红外转发",
+                "friendlyName": state.attributes.friendly_name,
+                "isReachable": true,
+                "manufacturerName": "PolyHome",
+                "modelName": state.attributes.platform,
+                "version": "0.1"
+            };
+            discovered_appliances.push(dev_state);
         }
     });
     data.automations.forEach(data => {

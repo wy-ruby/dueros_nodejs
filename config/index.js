@@ -5,7 +5,7 @@
  */
 
 exports.app_config = {
-    "port": 8015
+    "port": 2019
 }
 
 exports.mqtt_config = {
