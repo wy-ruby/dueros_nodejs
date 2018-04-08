@@ -9,7 +9,7 @@ var usersModels = require('../models/users');
  */
 exports.RequestHandler = function(postData, asyncClient){
     console.log("控制打开");
-    
+
     let acc_token = postData.payload.accessToken;
     let message_id = postData.header.messageId;
     if (acc_token == null){

@@ -9,7 +9,7 @@ var usersModels = require('../models/users');
  */
 exports.RequestHandler = function(postData, asyncClient){
     console.log("减少音量--");
-    
+
     let acc_token = postData.payload.accessToken;
     let message_id = postData.header.messageId;
     if (acc_token == null){
