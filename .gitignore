@@ -3,3 +3,4 @@ rsa_public_key.pem
 Dockerfile
 .idea
 node_modules
+config/index.js

@@ -45,6 +45,8 @@ exports.RequestHandler = function(postData, asyncClient){
                 if(entity_id.split('.')[0] == 'remote'){
                     var content = {'service': 'send_command', 'plugin': entity_id.split('.')[0], 'data': {'entity_id': entity_id, 'command': ["9"]}};
                 }
+            }else{
+                throw new Error("Not Support");
             }
             return asyncClient.publish('/v1/polyhome-ha/host/' + topic + '/user_id/99/services/', JSON.stringify(content));
         })

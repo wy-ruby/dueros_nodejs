@@ -142,17 +142,30 @@ class Bot extends BaseBot {
                 return getHumiditySkill.RequestHandler(postData, asyncClient);
                 break;
             case "SetModeRequest":
+                //对空调的控制之模式的调节
                 return airConditionerModeSkill.RequestHandler(postData, asyncClient);
                 break;
-            case "IncrementFanSpeedRequest", "DecrementFanSpeedRequest":
-                //对空调的控制之风速的调节
-                return airConditionerSpeedSkill.RequestHandler(postData, asyncClient);
-                break;
-            case "IncrementTemperatureRequest", "DecrementTemperatureConfirmation":
-                //对空调的控制之温度的调节
+            case "IncrementTemperatureRequest":
+                //对空调IncrementTVChannelRequest的控制之温度的调节
                 return airConditionerTemperatureSkill.RequestHandler(postData, asyncClient);
                 break;
-            case "IncrementTVChannelRequest", "DecrementTVChannelRequest", "IncrementVolumeRequest", "DecrementVolumeRequest":
+            case "DecrementTemperatureRequest":
+                //对空调IncrementTVChannelRequest的控制之温度的调节
+                return airConditionerTemperatureSkill.RequestHandler(postData, asyncClient);
+                break;
+            case "IncrementTVChannelRequest":
+                //对电视的上/下一频道，音量大小调节进行处理
+                return tvControllerSkill.RequestHandler(postData, asyncClient);
+                break;
+            case "DecrementTVChannelRequest":
+                //对电视的上/下一频道，音量大小调节进行处理
+                return tvControllerSkill.RequestHandler(postData, asyncClient);
+                break;
+            case "IncrementVolumeRequest":
+                //对电视的上/下一频道，音量大小调节进行处理
+                return tvControllerSkill.RequestHandler(postData, asyncClient);
+                break;
+            case "DecrementVolumeRequest":
                 //对电视的上/下一频道，音量大小调节进行处理
                 return tvControllerSkill.RequestHandler(postData, asyncClient);
                 break;

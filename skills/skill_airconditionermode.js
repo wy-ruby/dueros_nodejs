@@ -8,7 +8,6 @@ var usersModels = require('../models/users');
  * DiscoverAppliancesRequest技能处理
  */
 exports.RequestHandler = function(postData, asyncClient){
-    console.log("控制关闭");
     let acc_token = postData.payload.accessToken;
     let message_id = postData.header.messageId;
     if (acc_token == null){
@@ -23,28 +22,29 @@ exports.RequestHandler = function(postData, asyncClient){
         })
         .then(function(topic){
             let entity_id = postData.payload.appliance.applianceId;
-            let type = postData.payload.mode.deviceType;
+            let type = postData.payload.mode.deviceType?postData.payload.mode.deviceType:"AIR_CONDITION";
+            console.log(type);
             let mode = postData.payload.mode.value;
             if (entity_id.split('.')[0] == 'remote') {
                 var content;
                 switch (type){
                     case "AIR_CONDITION":
-                    if (mode == "COOL"){
-                        content = {'service': 'send_command', 'plugin': entity_id.split('.')[0],'data': {'entity_id': entity_id, "command": ["59"]}};
-                    }else if (mode == "HEAT"){
-                        content = {'service': 'send_command', 'plugin': entity_id.split('.')[0],'data': {'entity_id': entity_id, "command": ["57"]}};
-                    }else if (mode == "AUTO"){
-                        content = {'service': 'send_command', 'plugin': entity_id.split('.')[0],'data': {'entity_id': entity_id, "command": ["76"]}};
-                    }
-                    return asyncClient.publish('/v1/polyhome-ha/host/' + topic + '/user_id/99/services/', JSON.stringify(content));
-                    break;
+                        if (mode == "COOL"){
+                            content = {'service': 'send_command', 'plugin': entity_id.split('.')[0],'data': {'entity_id': entity_id, "command": ["59"]}};
+                        }else if (mode == "HEAT"){
+                            content = {'service': 'send_command', 'plugin': entity_id.split('.')[0],'data': {'entity_id': entity_id, "command": ["57"]}};
+                        }else if (mode == "AUTO"){
+                            content = {'service': 'send_command', 'plugin': entity_id.split('.')[0],'data': {'entity_id': entity_id, "command": ["76"]}};
+                        }
+                        return asyncClient.publish('/v1/polyhome-ha/host/' + topic + '/user_id/99/services/', JSON.stringify(content));
+                        break;
                     case "AIR_PURIFIER":
-                    break;
+                        break;
                 }
-            } else if (entity_id.split('.')[0] == 'cover') {
-                var content = {'service': 'turn_off', 'plugin': entity_id.split('.')[0],'data': {'entity_id': entity_id}};
-                return asyncClient.publish('/v1/polyhome-ha/host/' + topic + '/user_id/99/services/', JSON.stringify(content));
+            } else {
+                throw new Error("Not Support");
             }
+            return asyncClient.publish('/v1/polyhome-ha/host/' + topic + '/user_id/99/services/', JSON.stringify(content));
         })
         .then(function(data){
             return {
