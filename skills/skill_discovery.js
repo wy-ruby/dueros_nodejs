@@ -21,20 +21,31 @@ exports.RequestHandler = function(postData, asyncClient){
             return usersModels.getUserById(data.user_id);
         })
         .then(function(data){
-            return data.family[0].device_id;
+            return data.family[0];
         })
         .then(function(gw_sn){
-            return asyncClient.subscribe("/v1/polyhome-ha/host/" + gw_sn + "/ack/")
+            return asyncClient.subscribe("/v1/polyhome-ha/host/" + gw_sn.device_id + "/ack/")
                 .then(function(){
                     return gw_sn;
                 });
         })
         .then(function(gw_sn){
-            let content = {'service': 'get_states', 'plugin': 'gateway','data': {}};
-            asyncClient.publish("/v1/polyhome-ha/host/" + gw_sn + "/user_id/99/services/", JSON.stringify(content))
+            //这样如果匹配到了话说明是mac地址的方式的，这样的要发平板
+            if(gw_sn.indexOf(":") > 0){
+                var content = {"param":{},"method":"GetDbDevList"};
+                var topic = "/polyhome/v1/house/" + "gw_sn.family_id" + "/host/";
+            }else{
+                var content = {'service': 'get_states', 'plugin': 'gateway','data': {}};
+                var topic = "/v1/polyhome-ha/host/" + gw_sn.device_id + "/user_id/99/services/";
+            }
+            asyncClient.publish(topic, JSON.stringify(content))
                 .then(function(){
-                    let content = {'service': 'get_all_automation', 'plugin': 'gateway','data': {}};
-                    return asyncClient.publish("/v1/polyhome-ha/host/" + gw_sn + "/user_id/99/services/", JSON.stringify(content))
+                    if(gw_sn.indexOf(":") > 0){
+                        var content_scene = {"param":{},"method":"GetSenceList"};
+                    }else{
+                        var content_scene = {'service': 'get_all_automation', 'plugin': 'gateway','data': {}};
+                    }
+                    return asyncClient.publish(topic, JSON.stringify(content_scene))
                 });
         });
 
