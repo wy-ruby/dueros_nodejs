@@ -9,9 +9,9 @@ exports.app_config = {
 }
 
 exports.mqtt_config = {
-    "url": 'mqtt://123.57.139.200',
+    "url": 'mqtt://60.205.151.71',
     "port": 1883,
-    "clinet_id": "dueros_polyhome_service_00",
+    "clinet_id": "dueros_polyhome_service_01",
     "username": "polyhome",
     "password": "123"
 }

@@ -13,7 +13,7 @@ exports.RequestHandler = function(postData, asyncClient){
     let acc_token = postData.payload.accessToken;
     let message_id = postData.header.messageId;
     if (acc_token == null){
-        acc_token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJhNGI3MGQ5Mi00YzBjLTRhNzQtOWJlMS0zODE3ODhhMjU5YTUiLCJzdWIiOjU0NywiZXhwIjoxNTIyNjY3NDE4LCJpYXQiOjE1MjI2NjM4MTh9.Y6lZtHbNj-SEBHikuxvJoskic_BxBDEszvVCr1h_yoFCBhSqLNFAE_Wjs5tdgirF7TW9kEoMT7WnTTt5DhrTjZYY7eJS_4OYjEmE55FpGaeELBmX2io0rT7ATtsV-UgUvgH22fkqMGkFpGEY_llYpX3PcoE8rtC9e81YPXFb-Tp_YwvmyYSj5HbXQ5rBHQKHCtZ5vIzP1HJXTNXx1sKVfa8U8E8e9Ui--Wa-5rt0fNsQL3Rzc6T0JcUJGUjbnVtGUrT5LaOLsC_rLnwS3JY-uBtMsVkvPcvBICXIOSy3fZP4V6-7_7Ex0_gMNXGg6cWTUfgTxs9IdKBoqymLDYY8cA";
+        acc_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI5MGRlMDdlZi1lNmE5LTQ1OWYtYTE0Ni05YjFkZTE0N2RlMDAiLCJzdWIiOjgwMSwiZXhwIjoxNTIzNDM1MDc5LCJpYXQiOjE1MjM0MzE0Nzl9.7pdTGyBDIeuhkV_pfV5jXCgCaEYt47-xy24w6v_UZNY";
     }
     let _this = this;
     tokenModels.generateGetTopicByAccessToken(acc_token)
@@ -24,23 +24,30 @@ exports.RequestHandler = function(postData, asyncClient){
             return data.family[0];
         })
         .then(function(gw_sn){
-            return asyncClient.subscribe("/v1/polyhome-ha/host/" + gw_sn.device_id + "/ack/")
+            if(gw_sn.device_id.indexOf(":") > 0){
+                return asyncClient.subscribe("/polyhome/v1/house/" + gw_sn.family_id + "/client/")
                 .then(function(){
                     return gw_sn;
                 });
+            }else{
+                return asyncClient.subscribe("/v1/polyhome-ha/host/" + gw_sn.device_id + "/ack/")
+                .then(function(){
+                    return gw_sn;
+                });
+            }
         })
         .then(function(gw_sn){
             //这样如果匹配到了话说明是mac地址的方式的，这样的要发平板
-            if(gw_sn.indexOf(":") > 0){
+            if(gw_sn.device_id.indexOf(":") > 0){
                 var content = {"param":{},"method":"GetDbDevList"};
-                var topic = "/polyhome/v1/house/" + "gw_sn.family_id" + "/host/";
+                var topic = "/polyhome/v1/house/" + gw_sn.family_id + "/host/";
             }else{
                 var content = {'service': 'get_states', 'plugin': 'gateway','data': {}};
                 var topic = "/v1/polyhome-ha/host/" + gw_sn.device_id + "/user_id/99/services/";
             }
-            asyncClient.publish(topic, JSON.stringify(content))
+            asyncClient.publish(topic, JSON.stringify(content) + '\n')
                 .then(function(){
-                    if(gw_sn.indexOf(":") > 0){
+                    if(gw_sn.device_id.indexOf(":") > 0){
                         var content_scene = {"param":{},"method":"GetSenceList"};
                     }else{
                         var content_scene = {'service': 'get_all_automation', 'plugin': 'gateway','data': {}};
@@ -84,82 +91,99 @@ var builtData = function builtData(msg_id, data) {
     }
     let discovered_appliances = []
     data.states.forEach(state => {
-        if (state.entity_id.split('.')[0] == 'light'){
-            let dev_state = {
-                "actions": ["turnOn", "turnOff"],
-                "applianceTypes": ["SWITCH"],
-                "additionalApplianceDetails": {},
-                "applianceId": state.entity_id,
-                "friendlyDescription": "PolyHome智能灯控开关",
-                "friendlyName": state.attributes.friendly_name,
-                "isReachable": true,
-                "manufacturerName": "PolyHome",
-                "modelName": state.attributes.platform,
-                "version": "0.1"
-            };
-            discovered_appliances.push(dev_state);
-        } else if (state.entity_id.split('.')[0] == 'switch'){
-            let dev_state = {
-                "actions": ["turnOn", "turnOff"],
-                "applianceTypes": ["SOCKET"],
-                "additionalApplianceDetails": {},
-                "applianceId": state.entity_id,
-                "friendlyDescription": "PolyHome智能灯控开关",
-                "friendlyName": state.attributes.friendly_name,
-                "isReachable": true,
-                "manufacturerName": "PolyHome",
-                "modelName": state.attributes.platform,
-                "version": "0.1"
-            };
-            discovered_appliances.push(dev_state);
-        } else if (state.entity_id.split('.')[0] == 'cover'){
-            let dev_state = {
-                "actions": ["turnOn", "turnOff"],
-                "applianceTypes": ["CURTAIN"],
-                "additionalApplianceDetails": {},
-                "applianceId": state.entity_id,
-                "friendlyDescription": "PolyHome智能窗帘",
-                "friendlyName": state.attributes.friendly_name,
-                "isReachable": true,
-                "manufacturerName": "PolyHome",
-                "modelName": state.attributes.platform,
-                "version": "0.1"
-            };
-            discovered_appliances.push(dev_state);
-        } else if (state.entity_id.split('.')[0] == 'binary_sensor'){
-            let dev_state = {
-                "actions": [""],
-                "applianceTypes": ["SWITCH"],
-                "additionalApplianceDetails": {},
-                "applianceId": state.entity_id,
-                "friendlyDescription": "PolyHome智能感应器",
-                "friendlyName": state.attributes.friendly_name,
-                "isReachable": true,
-                "manufacturerName": "PolyHome",
-                "modelName": state.attributes.platform,
-                "version": "0.1"
-            };
-            discovered_appliances.push(dev_state);
-        } else if (state.entity_id.split('.')[0] == 'sensor'){
-            if (state.attributes.platform == 'weiguoair'){
-                let actions = [""];
-                switch (state.attributes.unit_of_measurement){
-                    case "\u00b0C":
-                        actions.push("getTemperatureReading");
-                    break;
-                    case "%":
-                        actions.push("getHumidity");
-                    break;
-                    case "\u03bcg/m3":
-                        actions.push("getAirPM25");
-                    break;
-                }
+        if(state.entity_id != null){
+            if (state.entity_id.split('.')[0] == 'light'){
                 let dev_state = {
-                    "actions": actions,
-                    "applianceTypes": ["AIR_PURIFIER"],
+                    "actions": ["turnOn", "turnOff"],
+                    "applianceTypes": ["SWITCH"],
                     "additionalApplianceDetails": {},
                     "applianceId": state.entity_id,
-                    "friendlyDescription": "PolyHome智能探测器",
+                    "friendlyDescription": "PolyHome智能灯控开关",
+                    "friendlyName": state.attributes.friendly_name,
+                    "isReachable": true,
+                    "manufacturerName": "PolyHome",
+                    "modelName": state.attributes.platform,
+                    "version": "0.1"
+                };
+                discovered_appliances.push(dev_state);
+            } else if (state.entity_id.split('.')[0] == 'switch'){
+                let dev_state = {
+                    "actions": ["turnOn", "turnOff"],
+                    "applianceTypes": ["SOCKET"],
+                    "additionalApplianceDetails": {},
+                    "applianceId": state.entity_id,
+                    "friendlyDescription": "PolyHome智能灯控开关",
+                    "friendlyName": state.attributes.friendly_name,
+                    "isReachable": true,
+                    "manufacturerName": "PolyHome",
+                    "modelName": state.attributes.platform,
+                    "version": "0.1"
+                };
+                discovered_appliances.push(dev_state);
+            } else if (state.entity_id.split('.')[0] == 'cover'){
+                let dev_state = {
+                    "actions": ["turnOn", "turnOff"],
+                    "applianceTypes": ["CURTAIN"],
+                    "additionalApplianceDetails": {},
+                    "applianceId": state.entity_id,
+                    "friendlyDescription": "PolyHome智能窗帘",
+                    "friendlyName": state.attributes.friendly_name,
+                    "isReachable": true,
+                    "manufacturerName": "PolyHome",
+                    "modelName": state.attributes.platform,
+                    "version": "0.1"
+                };
+                discovered_appliances.push(dev_state);
+            } else if (state.entity_id.split('.')[0] == 'binary_sensor'){
+                let dev_state = {
+                    "actions": [""],
+                    "applianceTypes": ["SWITCH"],
+                    "additionalApplianceDetails": {},
+                    "applianceId": state.entity_id,
+                    "friendlyDescription": "PolyHome智能感应器",
+                    "friendlyName": state.attributes.friendly_name,
+                    "isReachable": true,
+                    "manufacturerName": "PolyHome",
+                    "modelName": state.attributes.platform,
+                    "version": "0.1"
+                };
+                discovered_appliances.push(dev_state);
+            } else if (state.entity_id.split('.')[0] == 'sensor'){
+                if (state.attributes.platform == 'weiguoair'){
+                    let actions = [""];
+                    switch (state.attributes.unit_of_measurement){
+                        case "\u00b0C":
+                            actions.push("getTemperatureReading");
+                            break;
+                        case "%":
+                            actions.push("getHumidity");
+                            break;
+                        case "\u03bcg/m3":
+                            actions.push("getAirPM25");
+                            break;
+                    }
+                    let dev_state = {
+                        "actions": actions,
+                        "applianceTypes": ["AIR_PURIFIER"],
+                        "additionalApplianceDetails": {},
+                        "applianceId": state.entity_id,
+                        "friendlyDescription": "PolyHome智能探测器",
+                        "friendlyName": state.attributes.friendly_name,
+                        "isReachable": true,
+                        "manufacturerName": "PolyHome",
+                        "modelName": state.attributes.platform,
+                        "version": "0.1"
+                    };
+                    discovered_appliances.push(dev_state);
+                }
+            }else if (state.entity_id.split('.')[0] == 'remote'){
+                let dev_state = {
+                    "actions": ["incrementVolume", "decrementVolume", "setVolume", "incrementTemperature"
+                        , "decrementTemperature", "setTemperature", "decrementTVChannel", "incrementTVChannel", "setMode"],
+                    "applianceTypes": ["TV_SET", "AIR_CONDITION"],
+                    "additionalApplianceDetails": {},
+                    "applianceId": state.entity_id,
+                    "friendlyDescription": "PolyHome红外转发",
                     "friendlyName": state.attributes.friendly_name,
                     "isReachable": true,
                     "manufacturerName": "PolyHome",
@@ -168,22 +192,52 @@ var builtData = function builtData(msg_id, data) {
                 };
                 discovered_appliances.push(dev_state);
             }
-        }else if (state.entity_id.split('.')[0] == 'remote'){
-            let dev_state = {
-                "actions": ["incrementVolume", "decrementVolume", "setVolume", "incrementTemperature"
-                    , "decrementTemperature", "setTemperature", "decrementTVChannel", "incrementTVChannel", "setMode"],
-                "applianceTypes": ["TV_SET", "AIR_CONDITION"],
-                "additionalApplianceDetails": {},
-                "applianceId": state.entity_id,
-                "friendlyDescription": "PolyHome红外转发",
-                "friendlyName": state.attributes.friendly_name,
-                "isReachable": true,
-                "manufacturerName": "PolyHome",
-                "modelName": state.attributes.platform,
-                "version": "0.1"
-            };
-            discovered_appliances.push(dev_state);
+        }else{
+            if(state.productname == 'lnlight'  || state.productname == 'light' || state.productname == 'walllight'){
+                let dev_state = {
+                    "actions": ["turnOn", "turnOff"],
+                    "applianceTypes": ["LIGHT"],
+                    "additionalApplianceDetails": {'way':state.way,'producname':state.productname},
+                    "applianceId": state.sn,
+                    "friendlyDescription": "PolyHome智能灯控开关",
+                    "friendlyName": state.name,
+                    "isReachable": true,
+                    "manufacturerName": "PolyHome",
+                    "modelName": state.productname,
+                    "version": "0.1"
+                };
+                discovered_appliances.push(dev_state);
+            }else if(state.productname == 'sccurtain' || state.productname == 'curtain'){
+                let dev_state = {
+                    "actions": ["turnOn", "turnOff"],
+                    "applianceTypes": ["CURTAIN"],
+                    "additionalApplianceDetails": {'way':state.way,'producname':state.productname},
+                    "applianceId": state.sn,
+                    "friendlyDescription": "PolyHome智能灯控开关",
+                    "friendlyName": state.name,
+                    "isReachable": true,
+                    "manufacturerName": "PolyHome",
+                    "modelName": state.productname,
+                    "version": "0.1"
+                };
+                discovered_appliances.push(dev_state);
+            }else if(state.productname == 'socket'){
+                let dev_state = {
+                    "actions": ["turnOn", "turnOff"],
+                    "applianceTypes": ["SOCKET"],
+                    "additionalApplianceDetails": {'way':state.way,'producname':state.productname},
+                    "applianceId": state.sn,
+                    "friendlyDescription": "PolyHome智能灯控开关",
+                    "friendlyName": state.name,
+                    "isReachable": true,
+                    "manufacturerName": "PolyHome",
+                    "modelName": state.productname,
+                    "version": "0.1"
+                };
+                discovered_appliances.push(dev_state);
+            }
         }
+
     });
     data.automations.forEach(data => {
         let dev_state = {

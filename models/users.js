@@ -47,6 +47,29 @@ exports.findUserByName= function (username) {
     });
 };
 
+
+/*
+ * 根据家庭id获取用户的信息
+ */
+exports.findFamilyIdByUsers= function (family_id) {
+    return new Promise(function(resolve, reject) {
+        db.getDB().collection('users', function(err, collection) {
+            if (err) {
+                reject(err);
+            }
+            collection.findOne({'family': { $elemMatch: {"family_id": family_id}}}, function(err, result){
+                if (err) {
+                    reject(err);
+                }
+                if (result == null) {
+                    resolve(result);
+                }
+                resolve(result);
+            });
+        });
+    });
+};
+
 /*
  * 插入数据到user集合中
  */
