@@ -35,8 +35,8 @@ exports.RequestHandler = function(postData, asyncClient){
                 }else if(productname == "walllight"){
                     var content = {'method': 'ControlDevCmd', 'param': {'status':"off",'sn':entity_id,'productname':productname}};
                 }
-                console.log(topic);
-                console.log(JSON.stringify(content));
+                // console.log(topic);
+                // console.log(JSON.stringify(content));
                 return asyncClient.publish(topic, JSON.stringify(content) + "\n");
             }else{
                 if (entity_id.split('.')[0] == 'light') {

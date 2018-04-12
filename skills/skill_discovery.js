@@ -240,18 +240,33 @@ var builtData = function builtData(msg_id, data) {
 
     });
     data.automations.forEach(data => {
-        let dev_state = {
-            "actions": ["turnOn", "turnOff"],
-            "applianceTypes": ["SCENE_TRIGGER"],
-            "additionalApplianceDetails": {},
-            "applianceId": data.entity_id,
-            "friendlyDescription": "PolyHome智能情景",
-            "friendlyName": data.attributes.friendly_name,
-            "isReachable": true,
-            "manufacturerName": "PolyHome",
-            "modelName": data.attributes.id,
-            "version": "0.1"
-        };
+        if(data.entity_id != null){
+            var dev_state = {
+                "actions": ["turnOn", "turnOff"],
+                "applianceTypes": ["SCENE_TRIGGER"],
+                "additionalApplianceDetails": {},
+                "applianceId": data.entity_id,
+                "friendlyDescription": "PolyHome智能情景",
+                "friendlyName": data.attributes.friendly_name,
+                "isReachable": true,
+                "manufacturerName": "PolyHome",
+                "modelName": data.attributes.id,
+                "version": "0.1"
+            };
+        }else{
+            var dev_state = {
+                "actions": ["turnOn", "turnOff"],
+                "applianceTypes": ["SCENE_TRIGGER"],
+                "additionalApplianceDetails": {"producname":data.type},
+                "applianceId": data.senceid,
+                "friendlyDescription": "PolyHome智能情景",
+                "friendlyName": data.name,
+                "isReachable": true,
+                "manufacturerName": "PolyHome",
+                "modelName": data.type,
+                "version": "0.1"
+            };
+        }
         discovered_appliances.push(dev_state);
     })
     let data_payload = {

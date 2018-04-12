@@ -11,7 +11,6 @@ exports.RequestHandler = function(postData, asyncClient){
     console.log("控制打开开关");
     let acc_token = postData.payload.accessToken;
     let message_id = postData.header.messageId;
-    console.log(message_id)
     if (acc_token == null){
         acc_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI5MGRlMDdlZi1lNmE5LTQ1OWYtYTE0Ni05YjFkZTE0N2RlMDAiLCJzdWIiOjgwMSwiZXhwIjoxNTIzNDM1MDc5LCJpYXQiOjE1MjM0MzE0Nzl9.7pdTGyBDIeuhkV_pfV5jXCgCaEYt47-xy24w6v_UZNY";
     }
@@ -24,10 +23,8 @@ exports.RequestHandler = function(postData, asyncClient){
         })
         .then(function(topic){
             let entity_id = postData.payload.appliance.applianceId;
-            console.log(entity_id)
             let res_content = topic
             if(res_content.device_id.indexOf(":") > 0){
-                console.log(res_content)
                 let productname = postData.payload.appliance.additionalApplianceDetails.producname;
                 let way = postData.payload.appliance.additionalApplianceDetails.way;
                 let topic = "/polyhome/v1/house/" + res_content.family_id + "/host/";
@@ -35,9 +32,9 @@ exports.RequestHandler = function(postData, asyncClient){
                     var content = {'method': 'ControlDevCmd', 'param': {'way': way,'status':"on",'sn':entity_id,'productname':productname}};
                 }else if(productname == "walllight"){
                     var content = {'method': 'ControlDevCmd', 'param': {'status':"on",'sn':entity_id,'productname':productname}};
+                }else if (productname == "commonsence"){
+                    var content = {"param":{"senceid":entity_id},"method":"OnClickSence"};
                 }
-                console.log(topic);
-                console.log(JSON.stringify(content));
                 return asyncClient.publish(topic, JSON.stringify(content) + "\n");
             }else{
                 if (entity_id.split('.')[0] == 'automation'){
