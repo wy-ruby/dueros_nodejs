@@ -14,7 +14,6 @@ const airConditionerSpeedSkill = require('./skills/skill_airconditionerspeed');
 const airConditionerModeSkill = require('./skills/skill_airconditionermode');
 const getStatusSkill = require('./skills/skill_getrunstatus');
 const getPM25Skill = require('./skills/skill_pm25');
-const getCO2Skill = require('./skills/skill_co2');
 const getHumiditySkill = require('./skills/skill_gethumidity');
 
 class Bot extends BaseBot {
