@@ -1,18 +1,18 @@
 'use strict';
 
-var mongodb = require('./base.js');
-var db = require('./base.js');
+const mongodb = require('./base.js');
+const db = require('./base.js');
 
 /*
  * 获取用户数据
  */
-exports.getUserById = function (id) {
-    return new Promise(function(resolve, reject) {
-        db.getDB().collection('users', function(err, collection) {
+exports.getUserById = (id) => {
+    return new Promise((resolve, reject) => {
+        db.getDB().collection('users', (err, collection) => {
             if (err) {
                 reject(err);
             }
-            collection.findOne({'id': id}, function(err, result){
+            collection.findOne({'id': id}, (err, result) => {
                 if (err) {
                     reject(err);
                 }
@@ -28,17 +28,17 @@ exports.getUserById = function (id) {
 /*
  * 根据用户名获取用户
  */
-exports.findUserByName= function (username) {
-    return new Promise(function(resolve, reject) {
-        db.getDB().collection('users', function(err, collection) {
-            if (err) {
+exports.findUserByName= (username) => {
+    return new Promise((resolve, reject) => {
+        db.getDB().collection('users', (err, collection) => {
+            if(err) {
                 reject(err);
             }
-            collection.findOne({'mobile': username}, function(err, result){
-                if (err) {
+            collection.findOne({'mobile': username}, (err, result) => {
+                if(err) {
                     reject(err);
                 }
-                if (result == null) {
+                if(result == null) {
                     resolve(result);
                 }
                 resolve(result);
@@ -47,21 +47,20 @@ exports.findUserByName= function (username) {
     });
 };
 
-
 /*
  * 根据家庭id获取用户的信息
  */
-exports.findFamilyIdByUsers= function (family_id) {
-    return new Promise(function(resolve, reject) {
-        db.getDB().collection('users', function(err, collection) {
-            if (err) {
+exports.findFamilyIdByUsers = (family_id) => {
+    return new Promise((resolve, reject) => {
+        db.getDB().collection('users', (err, collection) => {
+            if(err) {
                 reject(err);
             }
-            collection.findOne({'family': { $elemMatch: {"family_id": family_id}}}, function(err, result){
-                if (err) {
+            collection.findOne({'family': { $elemMatch: {"family_id": family_id}}}, (err, result) => {
+                if(err) {
                     reject(err);
                 }
-                if (result == null) {
+                if(result == null) {
                     resolve(result);
                 }
                 resolve(result);
@@ -73,17 +72,16 @@ exports.findFamilyIdByUsers= function (family_id) {
 /*
  * 插入数据到user集合中
  */
-exports.generateSaveUser = function(user) {
-    return new Promise(function(resolve, reject) {
-      db.getDB().collection('users', function(err, collection) {
+exports.generateSaveUser = (user) => {
+    return new Promise((resolve, reject) => {
+      db.getDB().collection('users', (err, collection) => {
         if (err) {
             return reject(err);
         }
-        collection.update({'id': user.id}, {$set: user}, {upsert: true}, function(err, result){
+        collection.update({'id': user.id}, {$set: user}, {upsert: true}, (err, result) => {
             if (err) {
                 reject(err);
             }
-            console.log(user);
             resolve(user);
         });
       });
@@ -93,14 +91,14 @@ exports.generateSaveUser = function(user) {
 /*
  * 根据user_id更新家庭
  */
-exports.generateUpdateFamilyByUser = function(user_id, device_id) {
-    return new Promise(function(resolve, reject) {
-      db.getDB().collection('users', function(err, collection) {
-        if (err) {
+exports.generateUpdateFamilyByUser = (user_id, device_id) => {
+    return new Promise((resolve, reject) => {
+      db.getDB().collection('users', (err, collection) => {
+        if(err) {
             return reject(err);
         }
-        collection.update({'id': parseInt(user_id)}, {$set: {'family': [{'device_id': device_id}]}}, function(err, result){
-            if (err) {
+        collection.update({'id': parseInt(user_id)}, {$set: {'family': [{'device_id': device_id}]}}, (err, result) => {
+            if(err) {
                 reject(err)
             }
             resolve(result);
@@ -112,13 +110,13 @@ exports.generateUpdateFamilyByUser = function(user_id, device_id) {
 /*
  * 插入数据到user集合中
  */
-exports.saveUser = function(user) {
-    db.getDB().collection('users', function(err, collection) {
-        if (err) {
+exports.saveUser = (user) => {
+    db.getDB().collection('users', (err, collection) => {
+        if(err) {
             return err;
         }
-        collection.insert(user, {safe: true}, function(err, result){
-            if (err) {
+        collection.insert(user, {safe: true}, (err, result) => {
+            if(err) {
                 return err
             }
             console.log(result)
@@ -130,17 +128,17 @@ exports.saveUser = function(user) {
 /*
  * 通过电话号获取用户
  */
-exports.getUsersByUserName = function(body){
-    return new Promise(function(resolve, reject) {
-        db.getDB().collection('users', function(err, collection) {
-            if (err) {
+exports.getUsersByUserName = (body) => {
+    return new Promise((resolve, reject) => {
+        db.getDB().collection('users', (err, collection) => {
+            if(err) {
                 reject(err);
             }
-            collection.findOne({'mobile': body.mobile}, function(err, result){
-                if (err) {
+            collection.findOne({'mobile': body.mobile}, (err, result) => {
+                if(err) {
                     reject(err)
                 }
-                if (result == null) {
+                if(result == null) {
                     resolve({'find':false, 'result': body});
                 }
                 resolve({'find':true, 'result': body});

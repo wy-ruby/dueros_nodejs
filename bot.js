@@ -120,8 +120,10 @@ class Bot extends BaseBot {
          * ===============这里开始处理智能家居的DCS协议细节================
          */
         if (!postData.header) return;
-        console.log("payLoadVersion: " + postData.header.payloadVersion);
-        console.log("token: " + postData.payload.accessToken);
+        console.log("payLoadVersion: ");
+        console.log(JSON.stringify(postData.header.payloadVersion))
+        console.log("token: ");
+        console.log(JSON.stringify(postData.payload.accessToken))
 
         // 处理协议类型
         switch (postData.header.name) {
@@ -169,7 +171,17 @@ class Bot extends BaseBot {
                 return tvControllerSkill.RequestHandler(postData, asyncClient);
                 break;
             default:
+                console.log("Not Support Command");
                 console.log(postData.header.name);
+                return {
+                    "header":{
+                        "namespace":"DuerOS.ConnectedHome.Control",
+                        "name":"UnsupportedTargetSettingError",
+                        "messageId": postData.header.messageId,
+                        "payloadVersion":"1"
+                    },
+                    "payload":{}
+                }
         }
     }
 }

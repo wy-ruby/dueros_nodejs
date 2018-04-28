@@ -1,17 +1,17 @@
 'use strict';
 
-var db = require('./base.js');
+const db = require('./base.js');
 
 /*
  * 存储accesstoken信息
  */
-exports.generateSaveToken = function (tokeninfo) {
-    return new Promise(function (resolve, reject) {
-        db.getDB().collection('tokens', function (err, collection) {
+exports.generateSaveToken = (tokeninfo) => {
+    return new Promise( (resolve, reject) => {
+        db.getDB().collection('tokens',  (err, collection) => {
             if (err) {
                 reject(err);
             }
-            collection.insert(tokeninfo, {safe: true}, function (err, result) {
+            collection.insert(tokeninfo, {safe: true},  (err, result) => {
                 if (err) {
                     reject(err);
                 }
@@ -24,13 +24,13 @@ exports.generateSaveToken = function (tokeninfo) {
 /*
  * 获取accesstoken
  */
-exports.generateGetTokenById = function (id) {
-    return new Promise(function (resolve, reject) {
-        db.getDB().collection('tokens', function (err, collection) {
+exports.generateGetTokenById =  (id) => {
+    return new Promise( (resolve, reject) => {
+        db.getDB().collection('tokens',  (err, collection) => {
             if (err) {
                 reject(err);
             }
-            collection.findOne({"id": id}, {safe: true}, function (err, result) {
+            collection.findOne({"id": id}, {safe: true},  (err, result) => {
                 if (err) {
                     reject(err);
                 }
@@ -43,13 +43,13 @@ exports.generateGetTokenById = function (id) {
 /*
  * 获取accesstoken
  */
-exports.generateGetTokenByUserId = function (user_id) {
-    return new Promise(function (resolve, reject) {
-        db.getDB().collection('tokens', function (err, collection) {
+exports.generateGetTokenByUserId =  (user_id) => {
+    return new Promise( (resolve, reject) => {
+        db.getDB().collection('tokens',  (err, collection) => {
             if (err) {
                 reject(err);
             }
-            collection.findOne({"user_id": user_id}, {safe: true}, function (err, result) {
+            collection.findOne({"user_id": user_id}, {safe: true},  (err, result) => {
                 if (err) {
                     reject(err);
                 }
@@ -62,13 +62,13 @@ exports.generateGetTokenByUserId = function (user_id) {
 /*
  * 更新gengaccesstoken信息
  */
-exports.generateUpdateToken = function (tokeninfo) {
-    return new Promise(function (resolve, reject) {
-        db.getDB().collection('tokens', function (err, collection) {
+exports.generateUpdateToken =  (tokeninfo) => {
+    return new Promise( (resolve, reject) => {
+        db.getDB().collection('tokens',  (err, collection) => {
             if (err) {
                 reject(err);
             }
-            collection.update({'user_id': tokeninfo.user_id}, {$set: {'token': tokeninfo.token}}, {safe: true}, function (err, result) {
+            collection.update({'user_id': tokeninfo.user_id}, {$set: {'token': tokeninfo.token}}, {safe: true},  (err, result) => {
                 if (err) {
                     reject(err);
                 }
@@ -81,13 +81,13 @@ exports.generateUpdateToken = function (tokeninfo) {
 /*
  * 删除指定accesstoken
  */
-exports.generateDeleteTokenById = function (id) {
-    return new Promise(function (resolve, reject) {
-        db.getDB().collection('tokens', function (err, collection) {
+exports.generateDeleteTokenById =  (id) => {
+    return new Promise( (resolve, reject) => {
+        db.getDB().collection('tokens',  (err, collection) => {
             if (err) {
                 reject(err);
             }
-            collection.remove({"id": id}, function (err, result) {
+            collection.remove({"id": id},  (err, result) => {
                 if (err) {
                     reject(err);
                 }
@@ -100,14 +100,14 @@ exports.generateDeleteTokenById = function (id) {
 /*
  * 通过accesstoken获取topic
  */
-exports.generateGetTopicByAccessToken = function (access_token) {
-    return new Promise(function (resolve, reject) {
-        db.getDB().collection('tokens', function (err, collection) {
-            if (err) {
+exports.generateGetTopicByAccessToken =  (access_token) => {
+    return new Promise( (resolve, reject) => {
+        db.getDB().collection('tokens', (err, collection) => {
+            if(err) {
                 reject(err);
             }
-            collection.findOne({"token": access_token}, function (err, result) {
-                if (err) {
+            collection.findOne({"token": access_token}, (err, result) => {
+                if(err) {
                     reject(err);
                 }
                 resolve(result);

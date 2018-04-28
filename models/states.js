@@ -1,6 +1,6 @@
 'use strict';
 
-var db = require('./base.js');
+const db = require('./base.js');
 
 /*
  * 存储all_states

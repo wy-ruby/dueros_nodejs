@@ -6,7 +6,6 @@ const config = require('./config/index');
 
 var app = express();
 
-// 探活请求
 // DuerOS会定期发送探活请求到你的服务，确保你的服务正常运转
 app.head('/', (req, res) => {
     res.sendStatus(204);
