@@ -28,12 +28,13 @@ exports.RequestHandler = function(postData, asyncClient){
                 let productname = postData.payload.appliance.additionalApplianceDetails.producname;
                 let way = postData.payload.appliance.additionalApplianceDetails.way;
                 let topic = "/polyhome/v1/house/" + res_content.family_id + "/host/";
+                let sn = entity_id.substr(0, entity_id.indexOf("-"))
                 if(productname == "lnlight" || productname == "light" || productname == "sccurtain" || productname == "curtain" || productname == "socket"){
-                    var content = {'method': 'ControlDevCmd', 'param': {'way': way,'status':"on",'sn':entity_id,'productname':productname}};
+                    var content = {'method': 'ControlDevCmd', 'param': {'way': way, 'status':"on", 'sn': sn, 'productname': productname}};
                 }else if(productname == "walllight"){
-                    var content = {'method': 'ControlDevCmd', 'param': {'status':"on",'sn':entity_id,'productname':productname}};
+                    var content = {"method": 'ControlDevCmd', "param": {'status': "on", 'sn': entity_id, "productname": productname}};
                 }else if (productname == "commonsence"){
-                    var content = {"param":{"senceid":entity_id},"method":"OnClickSence"};
+                    var content = {"param": {"senceid": entity_id},"method": "OnClickSence"};
                 }
                 return asyncClient.publish(topic, JSON.stringify(content) + "\n");
             }else{

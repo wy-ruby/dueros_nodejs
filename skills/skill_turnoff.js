@@ -26,17 +26,16 @@ exports.RequestHandler = function(postData, asyncClient){
             let res_content = topic
             let entity_id = postData.payload.appliance.applianceId;
             if(res_content.device_id.indexOf(":") > 0){
-                console.log(1231221)
                 let productname = postData.payload.appliance.additionalApplianceDetails.producname;
                 let way = postData.payload.appliance.additionalApplianceDetails.way;
                 let topic = "/polyhome/v1/house/" + res_content.family_id + "/host/";
+                let sn = entity_id.substr(0, entity_id.indexOf("-"))
                 if(productname == "lnlight" || productname == "light" || productname == "sccurtain" || productname == "curtain" || productname == "socket"){
-                    var content = {'method': 'ControlDevCmd', 'param': {'way': way,'status':"off",'sn':entity_id,'productname':productname}};
+                    var content = {"method": "ControlDevCmd", "param": {"way": way, "status": "off", "sn": sn, "productname": productname}};
                 }else if(productname == "walllight"){
-                    var content = {'method': 'ControlDevCmd', 'param': {'status':"off",'sn':entity_id,'productname':productname}};
+                    var content = {"method": "ControlDevCmd", "param": {"status": "off", "sn": sn, "productname": productname}};
                 }
-                // console.log(topic);
-                // console.log(JSON.stringify(content));
+                console.log(content)
                 return asyncClient.publish(topic, JSON.stringify(content) + "\n");
             }else{
                 if (entity_id.split('.')[0] == 'light') {
