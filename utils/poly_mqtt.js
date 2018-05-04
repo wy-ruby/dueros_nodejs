@@ -23,6 +23,7 @@ asyncClient.on('message', function (topic, message){
     // console.log("打印mqtt日志");
     // console.log(topic);
     // console.log(message.toString());
+    // console.log("打印mqtt日志结束");
     var gateway_sn = topic.split('/')[4];
     var json_data = JSON.parse(message.toString());
     //根据topic判断是圆盘还是平板，topic的值是clien的话就是指的平板
@@ -46,6 +47,16 @@ asyncClient.on('message', function (topic, message){
                 statesModels.generateSaveAutomations(gw_automations)
                     .then(function(data){
                          // console.log(data);
+                    });
+            }else if(json_data.msg == "GetAirStateDataCmdSuccess"){
+                let gw_ari = {
+                    "gw_sn": users.family[0].device_id,
+                    "times":(Date.parse(new Date())/1000).toString(),
+                    "infos": json_data.data.list
+                }
+                statesModels.generateSaveAirStates(gw_ari)
+                    .then(function(data){
+                        // console.log(data);
                     });
             }
         });

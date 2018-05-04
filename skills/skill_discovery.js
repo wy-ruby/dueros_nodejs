@@ -235,6 +235,20 @@ var builtData = function builtData(msg_id, data) {
                     "version": "0.1"
                 };
                 discovered_appliances.push(dev_state);
+            }else if(state.productname == 'temandhumsensor'){
+                let dev_state = {
+                    "actions": ["getAirPM25", "getTemperatureReading", "getHumidity"],
+                    "applianceTypes": ["AIR_PURIFIER"],
+                    "additionalApplianceDetails": {'producname':state.productname},
+                    "applianceId": state.sn,
+                    "friendlyDescription": "PolyHome智能探测器",
+                    "friendlyName": state.name,
+                    "isReachable": true,
+                    "manufacturerName": "PolyHome",
+                    "modelName": state.productname,
+                    "version": "0.1"
+                };
+                discovered_appliances.push(dev_state);
             }
         }
 

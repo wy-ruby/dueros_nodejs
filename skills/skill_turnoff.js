@@ -22,7 +22,6 @@ exports.RequestHandler = function(postData, asyncClient){
             return data.family[0];
         })
         .then(function(topic){
-            console.log(topic)
             let res_content = topic
             let entity_id = postData.payload.appliance.applianceId;
             if(res_content.device_id.indexOf(":") > 0){

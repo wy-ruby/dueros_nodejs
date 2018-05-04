@@ -8,7 +8,7 @@ var usersModels = require('../models/users');
  * DiscoverAppliancesRequest技能处理
  */
 exports.RequestHandler = function(postData, asyncClient) {
-    console.log("==查询湿度==");
+    console.log("==查询温度==");
 
     let acc_token = postData.payload.accessToken;
     let message_id = postData.header.messageId;
@@ -99,14 +99,16 @@ exports.RequestHandler = function(postData, asyncClient) {
                 result = {
                     "header": {
                         "namespace": "DuerOS.ConnectedHome.Query",
-                        "name": "GetHumidityResponse",
+                        "name": "GetTemperatureReadingResponse",
                         "messageId": message_id,
                         "payloadVersion": "1"
                     },
                     "payload": {
-                        "humidity": {
-                            "value": data.value
-                        }
+                        "temperatureReading": {
+                            "value": data.value,
+                            "scale": "CELSIUS"
+                        },
+                        "applianceResponseTimestamp": "2017-08-12T11:20:50.52Z"
                     }
                 };
                 return result
@@ -126,7 +128,7 @@ exports.RequestHandler = function(postData, asyncClient) {
                         if (state == null) {
                             return null
                         } else {
-                            return parseInt(data['infos'][air_num]['data']['humidity']);
+                            return parseInt(data['infos'][air_num]['data']['temperature']);
                         }
                     })
                     .then((value) => {
@@ -135,14 +137,16 @@ exports.RequestHandler = function(postData, asyncClient) {
                             return {
                                 "header": {
                                     "namespace": "DuerOS.ConnectedHome.Query",
-                                    "name": "GetHumidityResponse",
+                                    "name": "GetTemperatureReadingResponse",
                                     "messageId": message_id,
                                     "payloadVersion": "1"
                                 },
                                 "payload": {
-                                    "humidity": {
-                                        "value": value
-                                    }
+                                    "temperatureReading": {
+                                        "value": value,
+                                        "scale": "CELSIUS"
+                                    },
+                                    "applianceResponseTimestamp": "2017-08-12T11:20:50.52Z"
                                 }
                             }
                         } else {
