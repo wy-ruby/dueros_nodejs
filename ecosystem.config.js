@@ -35,7 +35,7 @@ module.exports = {
       ref  : 'origin/master',
       repo : 'git@git.ourjujia.com:zhangxuesong/duer-node.git',
       path : '/home/live/dueros-wangyun',
-      'post-deploy' : 'cnpm install && pm2 reload ecosystem.config.js --env production --watch'
+      'post-deploy' : 'cnpm install && pm2 startOrRestart ecosystem.config.js --env production --watch'
     },
     dev : {
       user : 'node',
