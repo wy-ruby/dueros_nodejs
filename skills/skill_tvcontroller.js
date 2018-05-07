@@ -8,7 +8,7 @@ var usersModels = require('../models/users');
  * DiscoverAppliancesRequest技能处理
  */
 exports.RequestHandler = function(postData, asyncClient){
-    console.log("控制关闭");
+    console.log("电视控制");
     let acc_token = postData.payload.accessToken;
     let message_id = postData.header.messageId;
     let action_name = postData.header.name;

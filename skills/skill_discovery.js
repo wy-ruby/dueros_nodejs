@@ -67,6 +67,7 @@ exports.RequestHandler = function(postData, asyncClient){
             return statesModels.generateGetStatesBySn(gateway_sn);
         })
         .then(function(data){
+            console.log(data)
             return builtData(postData.header.messageId, data);
         })
         .catch(function(err){
@@ -179,7 +180,7 @@ var builtData = function builtData(msg_id, data) {
             }else if (state.entity_id.split('.')[0] == 'remote'){
                 let dev_state = {
                     "actions": ["incrementVolume", "decrementVolume", "setVolume", "incrementTemperature"
-                        , "decrementTemperature", "setTemperature", "decrementTVChannel", "incrementTVChannel", "setMode"],
+                        , "decrementTemperature", "setTemperature", "decrementTVChannel", "incrementTVChannel", "setMode", "turnOn", "turnOff"],
                     "applianceTypes": ["TV_SET", "AIR_CONDITION"],
                     "additionalApplianceDetails": {},
                     "applianceId": state.entity_id,
@@ -192,12 +193,12 @@ var builtData = function builtData(msg_id, data) {
                 };
                 discovered_appliances.push(dev_state);
             }
-        }else{
+        }else {
             if(state.productname == 'lnlight'  || state.productname == 'light' || state.productname == 'walllight'){
                 let dev_state = {
                     "actions": ["turnOn", "turnOff"],
                     "applianceTypes": ["LIGHT"],
-                    "additionalApplianceDetails": {'way':state.way,'producname':state.productname},
+                    "additionalApplianceDetails": {'way':state.way, 'producname': state.productname},
                     "applianceId": state.sn + '-' + state.way,
                     "friendlyDescription": "PolyHome智能灯控开关",
                     "friendlyName": state.name,
@@ -239,6 +240,21 @@ var builtData = function builtData(msg_id, data) {
                 let dev_state = {
                     "actions": ["getAirPM25", "getTemperatureReading", "getHumidity"],
                     "applianceTypes": ["AIR_PURIFIER"],
+                    "additionalApplianceDetails": {'producname':state.productname},
+                    "applianceId": state.sn,
+                    "friendlyDescription": "PolyHome智能探测器",
+                    "friendlyName": state.name,
+                    "isReachable": true,
+                    "manufacturerName": "PolyHome",
+                    "modelName": state.productname,
+                    "version": "0.1"
+                };
+                discovered_appliances.push(dev_state);
+            }else if(state.productname == 'remote'){
+                let dev_state = {
+                    "actions": ["incrementVolume", "decrementVolume", "setVolume", "incrementTemperature"
+                        , "decrementTemperature", "setTemperature", "decrementTVChannel", "incrementTVChannel", "setMode", "turnOn", "turnOff"],
+                    "applianceTypes": ["TV_SET", "AIR_CONDITION"],
                     "additionalApplianceDetails": {'producname':state.productname},
                     "applianceId": state.sn,
                     "friendlyDescription": "PolyHome智能探测器",

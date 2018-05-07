@@ -16,6 +16,7 @@ const getStatusSkill = require('./skills/skill_getrunstatus');
 const getPM25Skill = require('./skills/skill_pm25');
 const getHumiditySkill = require('./skills/skill_gethumidity');
 const getTemperatureSkill = require('./skills/skill_temperature');
+const getCo2QuantitySkill = require('./skills/skill_co2');
 
 class Bot extends BaseBot {
 
@@ -145,6 +146,9 @@ class Bot extends BaseBot {
                 break;
             case "GetTemperatureReadingRequest":
                 return getTemperatureSkill.RequestHandler(postData, asyncClient);
+                break;
+            case "GetCO2QuantityRequest":
+                return getCo2QuantitySkill.RequestHandler(postData, asyncClient);
                 break;
             case "SetModeRequest":
                 //对空调的控制之模式的调节
