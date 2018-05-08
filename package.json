@@ -9,8 +9,8 @@
     "setup_pro": "pm2 deploy ecosystem.config.js pro setup",
     "deploy_dev": "pm2 deploy ecosystem.config.js dev",
     "deploy_pro": "pm2 deploy ecosystem.config.js pro",
-    "dev": "export NODE_ENV=dev && node index.js",
-    "pro": "export NODE_ENV=pro && node index.js"
+    "dev": "export NODE_ENV=dev && node app.js",
+    "pro": "export NODE_ENV=pro && node app.js"
   },
   "author": "Zhangxuesong",
   "license": "BSD",
