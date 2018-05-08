@@ -44,7 +44,7 @@ class Bot extends BaseBot {
                     });
                 });
             }
-            var content = {'service': 'trigger_auto_by_name', 'plugin': 'gateway', 'data': {'name': sence}};
+            let content = {'service': 'trigger_auto_by_name', 'plugin': 'gateway', 'data': {'name': sence}};
             tokenModels.generateGetTopicByAccessToken(postData.System.user.acessToken)
                 .then(function (topic) {
                     console.log(topic)
@@ -73,10 +73,7 @@ class Bot extends BaseBot {
                     });
                 });
             }
-            var content = {
-                'service': 'trigger_light_by_name',
-                'plugin': 'gateway',
-                'data': {'name': sence, 'action': 'turn_on'}
+            let content = { 'service': 'trigger_light_by_name', 'plugin': 'gateway', 'data': {'name': sence, 'action': 'turn_on'}
             };
             asyncClient.publish('/v1/polyhome-ha/host/233690e739a64e58a1b9ce38b27e1f52/user_id/99/services/', JSON.stringify(content));
             let card = new Bot.Card.TextCard('正在开灯');
@@ -103,11 +100,7 @@ class Bot extends BaseBot {
                 });
             }
 
-            var content = {
-                'service': 'trigger_light_by_name',
-                'plugin': 'gateway',
-                'data': {'name': sence, 'action': 'turn_off'}
-            };
+            let content = { 'service': 'trigger_light_by_name', 'plugin': 'gateway', 'data': {'name': sence, 'action': 'turn_off'}};
             asyncClient.publish('/v1/polyhome-ha/host/233690e739a64e58a1b9ce38b27e1f52/user_id/99/services/', JSON.stringify(content));
             let card = new Bot.Card.TextCard('正在关灯');
             return new Promise(function (resolve, reject) {
@@ -183,10 +176,10 @@ class Bot extends BaseBot {
                 console.log(postData.header.name);
                 return {
                     "header":{
-                        "namespace":"DuerOS.ConnectedHome.Control",
-                        "name":"UnsupportedTargetSettingError",
+                        "namespace": "DuerOS.ConnectedHome.Control",
+                        "name": "UnsupportedTargetSettingError",
                         "messageId": postData.header.messageId,
-                        "payloadVersion":"1"
+                        "payloadVersion": "1"
                     },
                     "payload":{}
                 }
