@@ -1,14 +1,14 @@
 'use strict'
 
-var tokenModels = require('../models/tokens');
-var statesModels = require('../models/states');
-var usersModels = require('../models/users');
+const tokenModels = require('../models/tokens');
+const statesModels = require('../models/states');
+const usersModels = require('../models/users');
 
 /**
  * DiscoverAppliancesRequest技能处理
  */
 exports.RequestHandler = function(postData, asyncClient){
-    console.log("控制关闭");
+    console.log("空调风速调节请求");
     let acc_token = postData.payload.accessToken;
     let message_id = postData.header.messageId;
     //风速增加的具体值

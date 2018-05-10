@@ -1,13 +1,14 @@
 'use strict'
 
-var tokenModels = require('../models/tokens');
-var statesModels = require('../models/states');
-var usersModels = require('../models/users');
+const tokenModels = require('../models/tokens');
+const statesModels = require('../models/states');
+const usersModels = require('../models/users');
 
 /**
  * DiscoverAppliancesRequest技能处理
  */
 exports.RequestHandler = function(postData, asyncClient){
+    console.log("空调模式控制请求");
     let acc_token = postData.payload.accessToken;
     let message_id = postData.header.messageId;
     if (acc_token == null){
@@ -23,7 +24,6 @@ exports.RequestHandler = function(postData, asyncClient){
         .then(function(topic){
             let entity_id = postData.payload.appliance.applianceId;
             let type = postData.payload.mode.deviceType?postData.payload.mode.deviceType:"AIR_CONDITION";
-            console.log(type);
             let mode = postData.payload.mode.value;
             if (entity_id.split('.')[0] == 'remote') {
                 var content;
