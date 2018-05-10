@@ -14,7 +14,7 @@ app.head('/', (req, res) => {
 // 监听post请求，DuerOS以http POST的方式来请求你的服务
 app.post('/', (req, res) => {
     req.rawBody = '';
-    console.log(new Date().toLocaleDateString());
+    console.log(new Date().toLocaleString());
     req.setEncoding('utf-8');
     req.on('data', function(chunk) { 
         req.rawBody += chunk;
