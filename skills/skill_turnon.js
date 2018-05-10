@@ -8,7 +8,7 @@ var usersModels = require('../models/users');
  * TurnOnRequest技能处理
  */
 exports.RequestHandler = function(postData, asyncClient){
-    console.log("控制打开开关");
+    console.log("打开请求");
     let acc_token = postData.payload.accessToken;
     let message_id = postData.header.messageId;
     if (acc_token == null){
