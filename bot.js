@@ -110,7 +110,7 @@ class Bot extends BaseBot {
         //         });
         //     });
         // })
-        console.log(JSON.stringify(data));
+        console.log(JSON.stringify(postData));
         /**
          * ===============这里开始处理智能家居的DCS协议细节================
          */
