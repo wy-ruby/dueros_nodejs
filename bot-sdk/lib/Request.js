@@ -36,7 +36,7 @@ class Request {
         if (data && data.request) {
             this._requestType = data.request.type;
         }
-        console.log(data);
+
         if (!data.header){
             this._session = new Session(data.session);
             if (this._requestType == 'IntentRequest' && data.request) {
