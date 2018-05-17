@@ -33,7 +33,7 @@ module.exports = {
       host : '60.205.151.71',
       ref  : 'origin/master',
       repo : 'git@git.ourjujia.com:zhangxuesong/duer-node.git',
-      path : '/home/live/poly_dueros',
+      path : '/home/live/dueros-wangyun',
       'post-deploy' : 'git pull origin master && npm install --registry=https://registry.npm.taobao.org && pm2 startOrRestart ecosystem.config.js',
       env  : {
         NODE_ENV: 'dev'
