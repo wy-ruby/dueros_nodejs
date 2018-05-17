@@ -8,7 +8,7 @@ var usersModels = require('../models/users');
  * SetVolumeConfirmation技能处理
  */
 exports.RequestHandler = function(postData, asyncClient){
-    console.log("增加音量++");
+    console.log("设置音量请求");
 
     let acc_token = postData.payload.accessToken;
     let message_id = postData.header.messageId;

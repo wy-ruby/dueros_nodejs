@@ -1,19 +1,24 @@
 {
-  "name": "duer",
-  "version": "1.0.0",
+  "name": "polyhome-dueros",
+  "version": "0.0.3",
   "main": "index.js",
+  "description": "",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "setup_dev": "pm2 deploy ecosystem.config.js dev setup",
+    "setup_pro": "pm2 deploy ecosystem.config.js pro setup",
+    "deploy_dev": "pm2 deploy ecosystem.config.js dev",
+    "deploy_pro": "pm2 deploy ecosystem.config.js pro",
+    "dev": "export NODE_ENV=dev && node app.js",
+    "pro": "export NODE_ENV=pro && node app.js"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Zhangxuesong",
+  "license": "BSD",
   "dependencies": {
     "async-mqtt": "^1.0.1",
     "bot-sdk": "^1.1.1",
     "express": "^4.16.3",
     "mongodb": "^2.1.21",
     "mqtt": "^2.17.0"
-  },
-  "devDependencies": {},
-  "description": ""
+  }
 }

@@ -8,7 +8,7 @@ var usersModels = require('../models/users');
  * TurnOnRequest技能处理
  */
 exports.RequestHandler = function(postData, asyncClient){
-    console.log("控制关闭");
+    console.log("关闭请求");
     let acc_token = postData.payload.accessToken;
     let message_id = postData.header.messageId;
     if (acc_token == null){
@@ -34,7 +34,6 @@ exports.RequestHandler = function(postData, asyncClient){
                 }else if(productname == "walllight"){
                     var content = {"method": "ControlDevCmd", "param": {"status": "off", "sn": sn, "productname": productname}};
                 }
-                console.log(content)
                 return asyncClient.publish(topic, JSON.stringify(content) + "\n");
             }else{
                 if (entity_id.split('.')[0] == 'light') {

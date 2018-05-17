@@ -8,7 +8,7 @@ var usersModels = require('../models/users');
  * DiscoverAppliancesRequest技能处理
  */
 exports.RequestHandler = function(postData, asyncClient){
-    console.log("==查询CO2==");
+    console.log("CO2查询请求");
 
     let acc_token = postData.payload.accessToken;
     let message_id = postData.header.messageId;
