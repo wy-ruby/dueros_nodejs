@@ -63,6 +63,9 @@ exports.RequestHandler = function(postData, asyncClient){
         .then(function(data){
             return data.family[0].device_id;
         })
+        .then(function(data){
+            return delay(1000, data);
+        })
         .then(function(gateway_sn){
             return statesModels.generateGetStatesBySn(gateway_sn);
         })
@@ -81,6 +84,15 @@ exports.RequestHandler = function(postData, asyncClient){
                 "payload":{}
             }
         });
+}
+
+function delay(time, data) {
+    return new Promise((resolve , reject) => {
+        setTimeout(() => {
+            resolve(data);
+        }, time);
+    })
+
 }
 
 var builtData = function builtData(msg_id, data) {
