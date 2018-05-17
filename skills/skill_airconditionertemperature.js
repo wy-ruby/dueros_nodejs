@@ -41,6 +41,7 @@ exports.RequestHandler = function(postData, asyncClient){
             }else{
                 throw new Error("Not Support");
             }
+            console.log(content)
             return asyncClient.publish('/v1/polyhome-ha/host/' + topic + '/user_id/99/services/', JSON.stringify(content));
         })
         .then(function(data){
