@@ -13,6 +13,7 @@ exports.RequestHandler = function(postData, asyncClient){
     let message_id = postData.header.messageId;
     //要调整的温度的值
     let temperature_num = postData.payload.deltaValue.value;
+    console.log(temperature_num)
     let action_name = postData.header.name;
     let return_name = "";
     if (acc_token == null){
@@ -27,15 +28,16 @@ exports.RequestHandler = function(postData, asyncClient){
         })
         .then(function(topic){
             let entity_id = postData.payload.appliance.applianceId;
+            let producname = postData.payload.appliance.additionalApplianceDetails.producname;
             let command_num = ((parseInt(temperature_num)-16)+42)+"";
             if(action_name == "IncrementTemperatureRequest"){
                 return_name = "IncrementTemperatureConfirmation";
-                if (entity_id.split('.')[0] == 'remote') {
+                if (producname == 'remote') {
                     var content = {'service': 'send_command', 'plugin': entity_id.split('.')[0], 'data': {'entity_id': entity_id, 'command': [command_num]}};
                 }
             }else if(action_name == "DecrementTemperatureRequest"){
                 return_name = "DecrementTemperatureConfirmation";
-                if (entity_id.split('.')[0] == 'remote') {
+                if (producname == 'remote') {
                     var content = {'service': 'send_command', 'plugin': entity_id.split('.')[0], 'data': {'entity_id': entity_id, 'command': [command_num]}};
                 }
             }else{
