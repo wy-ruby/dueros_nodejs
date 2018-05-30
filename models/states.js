@@ -72,7 +72,7 @@ exports.generateGetStatesBySn = function (sn) {
             }
             collection.findOne({"gw_sn": sn}, function (err, result) {
                 if (err) {
-                    reject(err);
+                    resolve({});
                 }
                 resolve(result);
             });

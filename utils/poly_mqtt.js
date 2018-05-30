@@ -9,6 +9,7 @@ const usersModels = require('../models/users');
 const config = require('../config/index');
 
 var asyncClient = AsyncClient.connect(config.mqtt_config.url, {
+    port: config.mqtt_config.port,
     username: config.mqtt_config.username,
     password: config.mqtt_config.password,
     clientId: config.mqtt_config.clinet_id

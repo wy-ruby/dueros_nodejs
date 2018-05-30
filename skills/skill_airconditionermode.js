@@ -3,6 +3,8 @@
 const tokenModels = require('../models/tokens');
 const statesModels = require('../models/states');
 const usersModels = require('../models/users');
+const rcCodeModels = require('../models/rc_codes');
+const httpRequest = require('../utils/apiUtil');
 
 /**
  * DiscoverAppliancesRequest技能处理
@@ -19,55 +21,72 @@ exports.RequestHandler = function(postData, asyncClient){
             return usersModels.getUserById(data.user_id);
         })
         .then(function(data){
-            return data.family[0].device_id;
+            return data.family[0];
         })
         .then(function(topic){
             let entity_id = postData.payload.appliance.applianceId;
-            let type = postData.payload.mode.deviceType?postData.payload.mode.deviceType:"AIR_CONDITION";
-            let mode = postData.payload.mode.value;
-            if (entity_id.split('.')[0] == 'remote') {
-                var content;
-                switch (type){
-                    case "AIR_CONDITION":
-                        if (mode == "COOL"){
-                            content = {'service': 'send_command', 'plugin': entity_id.split('.')[0],'data': {'entity_id': entity_id, "command": ["59"]}};
-                        }else if (mode == "HEAT"){
-                            content = {'service': 'send_command', 'plugin': entity_id.split('.')[0],'data': {'entity_id': entity_id, "command": ["57"]}};
-                        }else if (mode == "AUTO"){
-                            content = {'service': 'send_command', 'plugin': entity_id.split('.')[0],'data': {'entity_id': entity_id, "command": ["76"]}};
-                        }
-                        return asyncClient.publish('/v1/polyhome-ha/host/' + topic + '/user_id/99/services/', JSON.stringify(content));
-                        break;
-                    case "AIR_PURIFIER":
-                        break;
+            let sn = postData.payload.appliance.additionalApplianceDetails.sn;
+
+            //这里处理空调遥看设备的模式的调整
+            let family_id = topic.family_id;
+            let kid = entity_id.split("_")[2];
+            return rcCodeModels.generateGetKeycodeByParams(family_id, sn).then(function(code){
+                let remote_list = code.devices[0].remotes;
+                let keywords = "";
+                remote_list.forEach(item => {
+                    if (item.keycode.id == kid) {
+                        item.keycode.list.forEach(list => {
+                            if(list.kn == "mode"){
+                                keywords = list.srccode;
+                            }
+                        })
+                    }
+                });
+                if (keywords == ""){
+                    let data = { code: -404, message: '没有找到该指令！' };
+                    return data;
+                }else{
+                    let data = {"f":sn, "zip": 1, "ir_device_type": 1, "rc_command_type": 1, "rc_command": keywords};
+                    let result = httpRequest.addRemoteTask(data);
+                    return result;
                 }
-            } else {
-                throw new Error("Not Support");
-            }
-            return asyncClient.publish('/v1/polyhome-ha/host/' + topic + '/user_id/99/services/', JSON.stringify(content));
+            });
         })
         .then(function(data){
-            return {
-                "header": {
-                    "namespace": "DuerOS.ConnectedHome.Control",
-                    "name": "SetModeConfirmation",
-                    "messageId": message_id,
-                    "payloadVersion": "1"
-                },
-                "payload": {
-                    "previousState": {
+            console.log(data);
+            if(data.code == 0){
+                return {
+                    "header": {
+                        "namespace": "DuerOS.ConnectedHome.Control",
+                        "name": "SetModeConfirmation",
+                        "messageId": message_id,
+                        "payloadVersion": "1"
+                    },
+                    "payload": {
+                        "previousState": {
+                            "mode": {
+                                "deviceType": equipment_type,
+                                //设置前的模式
+                                "value": ""
+                            }
+                        },
                         "mode": {
                             "deviceType": equipment_type,
-                            //设置前的模式
-                            "value": ""
+                            "value": equipment_mode
                         }
-                    },
-                    "mode": {
-                        "deviceType": equipment_type,
-                        "value": equipment_mode
                     }
+                };
+            }else{
+                return {
+                    "header":{
+                        "namespace":"DuerOS.ConnectedHome.Control",
+                        "name":"DriverInternalError",
+                        "messageId":message_id,
+                        "payloadVersion":"1"
+                    },
+                    "payload":{}
                 }
-            };
+            }
         })
         .catch(function(err){
             return {

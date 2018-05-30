@@ -70,6 +70,29 @@ exports.findFamilyIdByUsers = (family_id) => {
 };
 
 /*
+ * 根据设备的sn获取用户的信息
+ */
+exports.findUsersIdBySn = (sn) => {
+    console.log(sn)
+    return new Promise((resolve, reject) => {
+        db.getDB().collection('users', (err, collection) => {
+            if(err) {
+                reject(err);
+            }
+            collection.findOne({'family': { $elemMatch: {"device_id": sn}}}, (err, result) => {
+                if(err) {
+                    reject(err);
+                }
+                if(result == null) {
+                    resolve(result);
+                }
+                resolve(result);
+            });
+        });
+    });
+};
+
+/*
  * 插入数据到user集合中
  */
 exports.generateSaveUser = (user) => {

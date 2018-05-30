@@ -154,6 +154,14 @@ class Bot extends BaseBot {
                 //对空调IncrementTVChannelRequest的控制之温度的调节
                 return airConditionerTemperatureSkill.RequestHandler(postData, asyncClient);
                 break;
+            case "IncrementFanSpeedRequest":
+                //对空调IncrementTVChannelRequest的控制之风速的增加
+                return airConditionerSpeedSkill.RequestHandler(postData, asyncClient);
+                break;
+            case "DecrementFanSpeedRequest":
+                //对空调IncrementTVChannelRequest的控制之风速的减小
+                return airConditionerSpeedSkill.RequestHandler(postData, asyncClient);
+                break;
             case "IncrementTVChannelRequest":
                 //对电视的上/下一频道，音量大小调节进行处理
                 return tvControllerSkill.RequestHandler(postData, asyncClient);
