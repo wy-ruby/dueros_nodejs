@@ -1,7 +1,7 @@
 'use strict';
 
 const MongoClient = require('mongodb').MongoClient;
-const MONGO_URL = 'mongodb://user:polyhome@60.205.151.71:57017/polydb';
+const MONGO_URL = 'mongodb://user:polyhome@123.57.139.200:57017/polydb';
 let mogo_db;
 
 MongoClient.connect(MONGO_URL, function(err, db){
